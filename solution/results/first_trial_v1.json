@@ -1,0 +1,41 @@
+{
+  "experiment": "FirstTrial v1",
+  "scope": "Public five-minute sample: 7500 graded frames, 17 possessions. Full-match quality is unknown.",
+  "base_repository_commit": "3de6b60aeabd2475d95879a651d38b72bc4fba00",
+  "configuration": "solution/config.json",
+  "design": "Four fixed comparisons. No model fitting or parameter search.",
+  "validation": {
+    "behavior_tests_passed": 18,
+    "submission_rows_per_method": 199319,
+    "official_format_valid": true,
+    "repeat_predictions_identical": true
+  },
+  "results": [
+    {
+      "method": "reference_smooth50",
+      "frame_accuracy": 0.7132,
+      "macro_f1": 0.620733,
+      "spell_f1": 0.325581
+    },
+    {
+      "method": "gap_sequence",
+      "frame_accuracy": 0.691067,
+      "macro_f1": 0.509983,
+      "spell_f1": 0.273171
+    },
+    {
+      "method": "gap_stop_sequence",
+      "frame_accuracy": 0.712,
+      "macro_f1": 0.564227,
+      "spell_f1": 0.32381
+    },
+    {
+      "method": "gap_stop_sequence_x",
+      "frame_accuracy": 0.711333,
+      "macro_f1": 0.56396,
+      "spell_f1": 0.32381
+    }
+  ],
+  "finding": "No evidence of improvement over the reference. Stoppage recall is weak. X does not improve spell F1 in this comparison.",
+  "raw_assets_and_frame_predictions_included": false
+}

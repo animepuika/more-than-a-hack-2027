@@ -1,0 +1,21 @@
+{
+  "control_radius_m": 3.0,
+  "control_margin_m": 0.5,
+  "distance_scale_m": 1.5,
+  "team_switch_cost": 4.0,
+  "dead_switch_cost": 2.5,
+  "minimum_players": 8,
+  "max_player_speed_mps": 12.0,
+  "max_ball_speed_mps": 70.0,
+  "outside_margin_m": 0.5,
+  "outside_confirm_s": 0.24,
+  "walking_speed_mps": 1.4,
+  "slow_median_speed_mps": 1.2,
+  "slow_fraction": 0.6,
+  "slow_confirm_s": 2.0,
+  "missing_stop_after_s": 2.0,
+  "stationary_ball_speed_mps": 0.5,
+  "stationary_confirm_s": 1.5,
+  "stationary_min_player_distance_m": 2.5,
+  "max_abstention_gap_s": 2.0
+}
