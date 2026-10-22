@@ -1,0 +1,2 @@
+-r requirements-first-trial.txt
+hmmlearn==0.3.3

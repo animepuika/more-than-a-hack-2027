@@ -1,0 +1,20 @@
+{
+  "reaction_time_s": 0.7,
+  "max_acceleration_mps2": 7.0,
+  "max_speed_mps": 5.0,
+  "arrival_uncertainty_s": 0.45,
+  "control_horizon_s": 1.0,
+  "pitch_control_weight": 0.35,
+  "maximum_pitch_control_cost": 2.0,
+  "weak_confidence_margin": 0.03,
+  "medium_confidence_margin": 0.15,
+  "team_self_transition": 0.997,
+  "team_to_opponent_transition": 0.002,
+  "team_to_dead_transition": 0.001,
+  "dead_self_transition": 0.96,
+  "dead_to_team_transition": 0.02,
+  "same_state_emission_probability": 0.86,
+  "unknown_emission_probability": 0.05,
+  "same_confidence_mix": [0.10, 0.30, 0.60],
+  "wrong_confidence_mix": [0.65, 0.25, 0.10]
+}

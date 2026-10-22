@@ -1,0 +1,36 @@
+{
+  "experiment": "FirstTrial v4 — physics reach and HMM smoothing",
+  "scope": "Exploratory scores on the same public five-minute example used in v1-v3; 7,500 graded frames and 17 ground-truth possession spells.",
+  "design": "Seven fixed comparisons: prior references, an acceleration-aware player-reach prior, a fixed-prior categorical HMM, and combinations. No automatic winner selection.",
+  "validation": {
+    "behavior_tests_passed": 48,
+    "submission_rows_per_method": 199319,
+    "official_format_valid": true,
+    "prediction_only_repeat_identical_for_all_7_methods": true,
+    "saved_reference_v2_v3_predictions_unchanged": true
+  },
+  "results": [
+    {"method": "reference_smooth50", "frame_accuracy": 0.713200, "macro_f1": 0.620733, "spell_f1": 0.325581, "spell_range_90": [0.213953, 0.446512], "predicted_possessions": 26},
+    {"method": "v2_shape_motion", "frame_accuracy": 0.736267, "macro_f1": 0.580681, "spell_f1": 0.327273, "spell_range_90": [0.208636, 0.454545], "predicted_possessions": 27},
+    {"method": "v3_tag_soft", "frame_accuracy": 0.807200, "macro_f1": 0.763495, "spell_f1": 0.308333, "spell_range_90": [0.200000, 0.417083], "predicted_possessions": 31},
+    {"method": "v4_pitch_control", "frame_accuracy": 0.693333, "macro_f1": 0.580712, "spell_f1": 0.151724, "spell_range_90": [0.096552, 0.213793], "predicted_possessions": 41},
+    {"method": "v4_hmm", "frame_accuracy": 0.732400, "macro_f1": 0.576789, "spell_f1": 0.194872, "spell_range_90": [0.123077, 0.266667], "predicted_possessions": 61},
+    {"method": "v4_pitch_control_hmm", "frame_accuracy": 0.673067, "macro_f1": 0.577328, "spell_f1": 0.037931, "spell_range_90": [0.017241, 0.062069], "predicted_possessions": 99},
+    {"method": "v4_tagged_stoppage_hmm", "frame_accuracy": 0.801333, "macro_f1": 0.756946, "spell_f1": 0.192771, "spell_range_90": [0.125301, 0.260482], "predicted_possessions": 66}
+  ],
+  "pitch_control_coverage": {
+    "ball_target_frames": 113510,
+    "safely_interpolated_missing_ball_frames": 41,
+    "supported_team_reach_frames": 112267,
+    "eligible_weak_prior_frames": 94030
+  },
+  "interpretation": "V2 shape plus movement remains the best measured Spell F1. Current pitch-control and HMM settings substantially fragmented possession spells. These results do not justify adding either to the main prediction approach.",
+  "limitations": [
+    "The public sample has 17 possession spells and was used in all previous experiments; it is not independent validation.",
+    "HMM transitions and emissions are hand-set, not trained or calibrated.",
+    "The player-reach model is Spearman-inspired but omits ball-flight drag, passing choices, offside, individual player attributes, and full team-control integration.",
+    "Pitch control requires a target coordinate; safe interpolation covered only 41 missing-ball frames, so most long gaps remain unsupported.",
+    "Track slots are anonymous fragments; no named-player roles or stable identities are inferred.",
+    "Full-match performance and the best feature combination remain unknown."
+  ]
+}

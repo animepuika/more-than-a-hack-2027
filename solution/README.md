@@ -158,4 +158,43 @@ The new stoppage rules raised dead-ball recall from 7.3% in v2 shape plus moveme
 
 The tested duration limits were 0.32 seconds for team states and 0.40 seconds for dead-ball states. They changed only 1–8 of the 7,500 graded frames and did not change spell F1 or the possession count. These settings add little beyond the existing sequence smoothing. Automatic set-piece support slightly raised the soft version's spell score, but it stayed below the reference and its bootstrap range overlaps the other methods.
 
-All 40 behavior checks passed. A prediction-only repeat produced identical bytes for all 11 methods, and the v2 shape, v2 shape plus movement, and official reference outputs exactly match their saved versions. Full outputs, frame diagnostics, and the comparison page are in ignored `data/runs/third_trial/`; the safe aggregate score export is `results/first_trial_v3.json`. Nothing was committed or pushed for v3.
+All 40 behavior checks passed. A prediction-only repeat produced identical bytes for all 11 methods, and the v2 shape, v2 shape plus movement, and official reference outputs exactly match their saved versions. Full outputs, frame diagnostics, and the comparison page are in ignored `data/runs/third_trial/`; the safe aggregate score export is `results/first_trial_v3.json`. V3 is on `FirstTrial` in commit `90544bd`; generated match outputs remain local.
+
+## Fourth experiment: player reach physics and an HMM
+
+Install the added HMM dependency and run V4 with:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-v4.txt
+.\.venv\Scripts\python.exe -m solution.run_v4
+```
+
+V4 tests two ideas: **who could reach the ball soonest?** and **can a Hidden Markov Model (HMM) smooth frame-by-frame evidence?** It compares seven fixed methods, including the official reference, V2, and V3 results. It does not fit model settings to the public answer labels.
+
+### Physics reach estimate
+
+For each tracked player, the model uses their current position and smoothed movement direction. It lets them continue for a 0.7 second reaction time, then accelerate toward the ball at up to 7 m/s² until a 5 m/s cap. A logistic curve turns estimated arrival time into a chance of reaching the target within 1 second. Individual player chances are combined into relative Barcelona/Athletic reach scores, which enter the possession decoder only as a weak extra cost.
+
+This is **inspired by Spearman's pitch-control model**, not a full reproduction. The current version leaves out ball-flight drag and trajectory choice, offside, individual player attributes, and full pitch-control integration. It also needs a ball coordinate to calculate reach. The tracking file had ball coordinates on 56.9% of frames; safe interpolation filled only 41 additional missing-ball frames. So this version cannot resolve the long gaps that make up most hard cases.
+
+### HMM smoother
+
+The HMM reads the raw Home/Away/Dead cost winner and its confidence level. Its states are H, A, and D. The transition settings favor staying in the same state, and the emission settings describe how much to trust strong or weak observations. We set those values by hand; we did not train them on the 17 public possession spells. Each half is decoded separately. In this run, the HMM made more switches than the V2 sequence decoder.
+
+### Measured result on the public five minutes
+
+| Method | Frame accuracy | Spell F1 | 5th–95th percentile range | Predicted possessions |
+|---|---:|---:|---:|---:|
+| Official reference | 71.32% | 0.3256 | 0.214–0.447 | 26 |
+| V2 shape + movement | 73.63% | **0.3273** | 0.209–0.455 | 27 |
+| V3 soft cost + set-piece support | 80.72% | 0.3083 | 0.200–0.417 | 31 |
+| V4 pitch-control reach | 69.33% | 0.1517 | 0.097–0.214 | 41 |
+| V4 HMM | 73.24% | 0.1949 | 0.123–0.267 | 61 |
+| V4 pitch control + HMM | 67.31% | 0.0379 | 0.017–0.062 | 99 |
+| V4 tagged stoppage + HMM | 80.13% | 0.1928 | 0.125–0.260 | 66 |
+
+V2 shape + movement remains the strongest tested Spell F1 method at 0.3273. Every new V4 variant produced more predicted possession periods than the 17 in the public labels. These settings are too switchy for the main metric. Pitch control alone lowered both frame accuracy and Spell F1. Combining it with this HMM was worse still. Do not add either to the main approach yet.
+
+The public-example bootstrap ranges are wide and overlap. The sample has only 17 labelled spells and has already been used in V1–V4, so it cannot choose a full-match winner. The next useful step is to review specific wrong switches, then validate any new settings on separate labelled possessions.
+
+All 48 behavior tests passed, and a prediction-only repeat produced byte-identical files for all seven methods. The full run, scores, frame explanations, and comparison page are under ignored `data/runs/fourth_trial/`; the prediction-only repeat is in `data/runs/fourth_trial_repeat/`. The aggregate score export is `results/first_trial_v4.json`. The generated match outputs stay local; the repository contains the reusable source, settings, tests, and aggregate scores.
