@@ -89,8 +89,15 @@ def stable_gap_mask(labels, features, blocks, fps, max_gap_s):
     return mask
 
 
-def predict(tracking, features, blocks, config, use_stoppages=True, abstain=False):
+def predict(tracking, features, blocks, config, use_stoppages=True, abstain=False,
+            extra_team_costs=None):
     costs = evidence_costs(tracking, features, config, use_stoppages)
+    if extra_team_costs is not None:
+        extra_team_costs = np.asarray(extra_team_costs, dtype=float)
+        if (extra_team_costs.shape != (len(tracking), 2) or
+                not np.isfinite(extra_team_costs).all() or (extra_team_costs < 0).any()):
+            raise ValueError("Extra team costs must be finite nonnegative frame-by-two values")
+        costs[:, :2] += extra_team_costs
     labels = np.full(len(tracking), "X", dtype="<U1")
     reasons = np.full(len(tracking), "outside_scored_halves", dtype="<U40")
     for _, start, last in blocks:
@@ -109,6 +116,8 @@ def predict(tracking, features, blocks, config, use_stoppages=True, abstain=Fals
     reasons[control] = "ball_control_evidence"
     nearest_label = np.where(tracking.home_distance_m <= tracking.away_distance_m, "H", "A")
     reasons[control & (labels != nearest_label)] = "sequence_overrode_nearest_team"
+    if extra_team_costs is not None:
+        reasons[active & extra_team_costs.any(axis=1) & (labels != "D")] = "additional_team_context"
     reasons[active & (labels == "D")] = "dead_ball_sequence_state"
     if use_stoppages:
         reasons[active & (labels == "D") & features["slow_gap_stop"]] = "dead_ball_slow_missing_gap"
@@ -120,7 +129,8 @@ def predict(tracking, features, blocks, config, use_stoppages=True, abstain=Fals
         sl = slice(start, last + 1)
         stop_evidence = (features["outside_stop"][sl] | features["slow_gap_stop"][sl] |
                          features["stationary_stop"][sl]) if use_stoppages else np.zeros(last + 1 - start, bool)
-        if not control[sl].any() and not stop_evidence.any():
+        extra_evidence = extra_team_costs is not None and extra_team_costs[sl].any()
+        if not control[sl].any() and not stop_evidence.any() and not extra_evidence:
             labels[sl] = "X"
             reasons[sl] = "insufficient_evidence_in_half"
     if abstain:

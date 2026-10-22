@@ -1,0 +1,86 @@
+{
+  "experiment": "FirstTrial v2 - team shape and movement",
+  "scope": "Exploratory comparison on the same public five minutes used in v1; 7500 graded frames and 17 possessions. Full-match performance is unknown.",
+  "configuration": [
+    "solution/config.json",
+    "solution/config_v2.json"
+  ],
+  "design": "Six fixed comparisons; weak prototypes fitted to tracking-only visible-ball anchors. Public answers used only after prediction. No parameter search.",
+  "validation": {
+    "behavior_tests_passed": 31,
+    "submission_rows_per_method": 199319,
+    "official_format_valid": true,
+    "repeat_predictions_identical": true,
+    "v1_and_reference_unchanged": true
+  },
+  "results": [
+    {
+      "method": "reference_smooth50",
+      "frame_accuracy": 0.7132,
+      "macro_f1": 0.620733,
+      "spell_f1": 0.325581,
+      "spell_bootstrap_low": 0.213953,
+      "spell_bootstrap_high": 0.446512
+    },
+    {
+      "method": "v1_gap_stop",
+      "frame_accuracy": 0.712,
+      "macro_f1": 0.564227,
+      "spell_f1": 0.32381,
+      "spell_bootstrap_low": 0.2,
+      "spell_bootstrap_high": 0.447619
+    },
+    {
+      "method": "v2_shape",
+      "frame_accuracy": 0.736133,
+      "macro_f1": 0.580593,
+      "spell_f1": 0.327273,
+      "spell_bootstrap_low": 0.208636,
+      "spell_bootstrap_high": 0.454545
+    },
+    {
+      "method": "v2_motion",
+      "frame_accuracy": 0.6928,
+      "macro_f1": 0.547533,
+      "spell_f1": 0.328889,
+      "spell_bootstrap_low": 0.213333,
+      "spell_bootstrap_high": 0.435556
+    },
+    {
+      "method": "v2_shape_motion",
+      "frame_accuracy": 0.736267,
+      "macro_f1": 0.580681,
+      "spell_f1": 0.327273,
+      "spell_bootstrap_low": 0.208636,
+      "spell_bootstrap_high": 0.454545
+    },
+    {
+      "method": "v2_with_auto_tags",
+      "frame_accuracy": 0.717067,
+      "macro_f1": 0.568799,
+      "spell_f1": 0.28,
+      "spell_bootstrap_low": 0.1756,
+      "spell_bootstrap_high": 0.384
+    }
+  ],
+  "finding": "Shape supplies almost all frame-accuracy gain. Movement adds one correct frame to shape alone. Spell-score differences are small relative to broad bootstrap uncertainty. Automatic phase priors worsen spell F1 in this implementation. Missed stoppages remain a weakness.",
+  "bootstrap": {
+    "draws": 1000,
+    "percentiles": [
+      5,
+      95
+    ]
+  },
+  "raw_assets_and_frame_predictions_included": false,
+  "limitations": [
+    "The same public five-minute example was seen in v1; this is exploratory, not an independent validation set.",
+    "Full-match accuracy is unknown. No winner is selected automatically.",
+    "Proxy labels come from ball proximity and can be wrong; geometric costs are not calibrated probabilities.",
+    "Anonymous track slots can swap identities without a detectable jump. No named-player roles are inferred.",
+    "Short ball-gap interpolation estimates a location; it does not recover the real hidden ball path.",
+    "Convergence can describe pressing rather than possession. Remaining duplicate detections can bias motion summaries.",
+    "Automatic phase tags are noisy priors. Set-piece and goal intervals are not treated as confirmed stoppages.",
+    "Stoppage rules remain the v1 rules. Broadcast alignment, video review, and named roles remain unused.",
+    "All sequence inference and proxy fitting are offline and use future match observations."
+  ]
+}

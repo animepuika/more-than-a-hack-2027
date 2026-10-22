@@ -1,0 +1,20 @@
+{
+  "minimum_team_tracks": 7,
+  "minimum_motion_tracks": 5,
+  "duplicate_distance_m": 0.5,
+  "position_margin_m": 3.0,
+  "velocity_window_frames": 5,
+  "maximum_track_speed_mps": 12.0,
+  "maximum_acceleration_mps2": 12.0,
+  "burst_acceleration_mps2": 3.0,
+  "maximum_ball_interpolation_s": 2.0,
+  "maximum_interpolation_speed_mps": 40.0,
+  "convergence_radius_m": 15.0,
+  "convergence_closing_speed_mps": 2.0,
+  "anchor_radius_m": 1.5,
+  "anchor_opponent_distance_m": 2.5,
+  "minimum_anchors_per_team": 30,
+  "shape_weight": 0.35,
+  "motion_weight": 0.35,
+  "tag_weight": 0.35
+}

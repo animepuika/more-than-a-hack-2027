@@ -22,13 +22,16 @@ class Tracking:
     speed_players: np.ndarray
     median_player_speed_mps: np.ndarray
     walking_fraction: np.ndarray
+    track_xy_m: np.ndarray = None
+    home_slots: np.ndarray = None
 
     def __len__(self):
         return len(self.ball_xy_m)
 
 
 def load_tracking(meta_path, raw_path, n_frames, fps, pitch,
-                  max_player_speed_mps=12.0, walking_speed_mps=1.4, progress=None):
+                  max_player_speed_mps=12.0, walking_speed_mps=1.4, progress=None,
+                  retain_tracks=False):
     """Fail on frame/schema mismatches instead of silently shifting predictions."""
     root = ET.parse(meta_path).getroot()
     teams = list(root.iter("Team"))
@@ -54,6 +57,7 @@ def load_tracking(meta_path, raw_path, n_frames, fps, pitch,
     median_speed = np.full(n_frames, np.nan)
     walking_fraction = np.full(n_frames, np.nan)
     scale = np.asarray(pitch, dtype=float)
+    track_xy = np.full((n_frames, len(slots), 2), np.nan, dtype=np.float32) if retain_tracks else None
     count = 0
 
     with Path(raw_path).open(encoding="utf-8") as handle:
@@ -69,6 +73,8 @@ def load_tracking(meta_path, raw_path, n_frames, fps, pitch,
                 raise ValueError("Unexpected track/ball field count at row {}".format(index + 1))
             players = values.reshape(-1, 3)
             xy = players[:, :2] * scale
+            if track_xy is not None:
+                track_xy[index] = xy
             valid = np.isfinite(xy).all(axis=1)
             observed[index] = int(valid.sum())
             speed = players[:, 2]
@@ -92,4 +98,5 @@ def load_tracking(meta_path, raw_path, n_frames, fps, pitch,
     if count != n_frames:
         raise ValueError("Expected {} tracking rows, got {}".format(n_frames, count))
     return Tracking(float(fps), tuple(pitch), ball_xy, home_dist, away_dist,
-                    observed, speed_count, median_speed, walking_fraction)
+                    observed, speed_count, median_speed, walking_fraction, track_xy,
+                    home_slots if retain_tracks else None)
