@@ -198,3 +198,41 @@ V2 shape + movement remains the strongest tested Spell F1 method at 0.3273. Ever
 The public-example bootstrap ranges are wide and overlap. The sample has only 17 labelled spells and has already been used in V1–V4, so it cannot choose a full-match winner. The next useful step is to review specific wrong switches, then validate any new settings on separate labelled possessions.
 
 All 48 behavior tests passed, and a prediction-only repeat produced byte-identical files for all seven methods. The full run, scores, frame explanations, and comparison page are under ignored `data/runs/fourth_trial/`; the prediction-only repeat is in `data/runs/fourth_trial_repeat/`. The aggregate score export is `results/first_trial_v4.json`. The generated match outputs stay local; the repository contains the reusable source, settings, tests, and aggregate scores.
+
+## Fifth experiment: abstain on calm missing-ball frames
+
+Run the fixed V5 comparison with:
+
+```powershell
+.\.venv\Scripts\python.exe -m solution.run_v5
+```
+
+V5 tests whether writing `X` during missing-ball frames can keep the official spell scorer from treating uncertain guesses as possession changes. It compares abstention on every missing-ball frame with abstention only when player movement does not look like a scramble. The scramble signal is a proxy from anonymous track speeds and acceleration; it does not prove that a tackle, turnover, card, or injury happened.
+
+### Measured result on the public five minutes
+
+| Method | Accuracy | Spell F1 | Macro F1 | Predicted possessions |
+|---|---:|---:|---:|---:|
+| Official reference | 71.32% | 0.3256 | 0.6207 | 26 |
+| V2 shape + movement | 73.63% | **0.3273** | 0.5807 | 27 |
+| V3 tagged soft stoppage | 80.72% | 0.3083 | **0.7635** | 31 |
+| V5 V2 + calm-gap X | 70.33% | 0.3273 | 0.5831 | 27 |
+| V5 V3 + calm-gap X | 77.43% | 0.3083 | 0.7465 | 31 |
+
+The V5 `X` policies did not raise Spell F1. Calm-gap `X` ties V2 on the public sample, while the tagged V3 parent remains below V2 on the ranking metric. We should keep V2 as the current public-sample Spell F1 leader; the test does not establish a full-match winner.
+
+### Dead-ball audit
+
+The user's review correctly pointed to dead-ball detection as a major gap. Across the 1,469 public `D` frames, V2 marked only 107 as dead: **7.3% recall**, with no false `D` frames. V3 tagged soft stoppage raised this to 666 correct `D` frames: **45.3% recall and 96.1% precision**, but still missed 803 dead-ball frames and added 27 false `D` frames. V5's abstention policies leave these dead-ball predictions unchanged.
+
+This is the next modeling priority. First find whether play is live or stopped; only then decide which team has possession. Strong clues include a ball tracked outside the pitch, sustained ball stillness, collective movement slowing or gathering, automatic restart/goal tags, and a clear restart movement pattern. Low player speed alone is not enough: teams can move slowly while the ball is live. Use a time-aware state change with a short confirmation period and different thresholds for entering and leaving a stoppage, so one noisy frame cannot split a possession.
+
+Cards, fights, and injuries can explain why a pause happens, but the scored label only needs to say whether the ball is in play. Coordinates can suggest a disruption (for example, a group clustering around one point or one player stopping while others gather), but they cannot reliably identify the cause. The supplied BAR-ATH Smart Tagging has 638 automatic tactical instances, including set-piece and goal tags; it is not a complete manual foul, card, or injury log. The tactical video can help review examples, while the current V5 algorithm uses tracking and Smart Tagging rather than visual video recognition.
+
+### Candidate external training data
+
+The competition's [rules](https://github.com/metrica-sports/more-than-a-hack-2027/blob/main/RULES.md) permit external data when organisers can inspect it and the technical document explains it. They prohibit private full-match ground truth and any other source of corrected possession labels for this BAR-ATH fixture. A promising generic training source is Metrica's [public sample-data repository](https://github.com/metrica-sports/sample-data): it contains three anonymized matches with synchronized tracking and event data on a 105 × 68 m pitch. Event intervals can provide weak examples of live possession and ball-out/restart periods. This is a candidate for training generic movement/stoppage patterns, not a source of extra BAR-ATH answers. Its README asks users to acknowledge Metrica for public work.
+
+The external data was **not used in the V5 scores**. The local environment could not resolve GitHub to download it, so no training result is claimed. Before adding it, we should test across separate sample matches and record the source and preprocessing so the result remains reproducible.
+
+All 54 behavior tests passed, all seven outputs passed the official file-format validation, and a prediction-only repeat produced byte-identical files for all seven methods. Aggregate scores are in `results/first_trial_v5.json`; frame diagnostics and the comparison page are under ignored `data/runs/fifth_trial/`. No match data or generated frame-level outputs belong in the public repository.

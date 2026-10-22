@@ -1,0 +1,41 @@
+{
+  "experiment": "FirstTrial v5 — calm-gap abstention and dead-ball error audit",
+  "scope": "Exploratory scores on the public five-minute example; 7,500 graded frames and 17 ground-truth possession spells.",
+  "design": "Seven fixed comparisons. V5 tests X on every missing-ball frame versus X only on calm missing-ball frames. No public answers are used to predict, fit, or select a model.",
+  "validation": {
+    "behavior_tests_passed": 54,
+    "submission_rows_per_method": 199319,
+    "official_format_valid": true,
+    "prediction_only_repeat_identical_for_all_7_methods": true,
+    "saved_reference_v2_v3_predictions_unchanged": true
+  },
+  "results": [
+    {"method": "reference_smooth50", "frame_accuracy": 0.713200, "macro_f1": 0.620733, "spell_f1": 0.325581, "spell_range_90": [0.213953, 0.446512], "predicted_possessions": 26},
+    {"method": "v2_shape_motion", "frame_accuracy": 0.736267, "macro_f1": 0.580681, "spell_f1": 0.327273, "spell_range_90": [0.208636, 0.454545], "predicted_possessions": 27},
+    {"method": "v3_tag_soft", "frame_accuracy": 0.807200, "macro_f1": 0.763495, "spell_f1": 0.308333, "spell_range_90": [0.200000, 0.417083], "predicted_possessions": 31},
+    {"method": "v5_v2_x_all_missing", "frame_accuracy": 0.686800, "macro_f1": 0.574774, "spell_f1": 0.327273, "spell_range_90": [0.208636, 0.454545], "predicted_possessions": 27},
+    {"method": "v5_v2_x_calm", "frame_accuracy": 0.703333, "macro_f1": 0.583084, "spell_f1": 0.327273, "spell_range_90": [0.208636, 0.454545], "predicted_possessions": 27},
+    {"method": "v5_tag_x_all_missing", "frame_accuracy": 0.757733, "macro_f1": 0.738123, "spell_f1": 0.308333, "spell_range_90": [0.200000, 0.417083], "predicted_possessions": 31},
+    {"method": "v5_tag_x_calm", "frame_accuracy": 0.774267, "macro_f1": 0.746483, "spell_f1": 0.308333, "spell_range_90": [0.200000, 0.417083], "predicted_possessions": 31}
+  ],
+  "dead_ball_audit": [
+    {"method": "reference_smooth50", "true_dead_frames": 1469, "predicted_dead_frames": 478, "true_positive": 314, "false_positive": 164, "false_negative": 1155, "precision": 0.656904, "recall": 0.213751, "f1": 0.322548},
+    {"method": "v2_shape_motion", "true_dead_frames": 1469, "predicted_dead_frames": 107, "true_positive": 107, "false_positive": 0, "false_negative": 1362, "precision": 1.0, "recall": 0.072839, "f1": 0.135787},
+    {"method": "v3_tag_soft", "true_dead_frames": 1469, "predicted_dead_frames": 693, "true_positive": 666, "false_positive": 27, "false_negative": 803, "precision": 0.961039, "recall": 0.453370, "f1": 0.616096}
+  ],
+  "external_data_assessment": {
+    "competition_rules_allow_inspectable_external_data": true,
+    "prohibited": "Private full-match ground truth and other sources of corrected possession labels for the BAR-ATH fixture.",
+    "candidate": "Metrica Sports public sample-data repository: three anonymized matches with synchronized tracking and event data.",
+    "used_in_this_run": false,
+    "reason_not_used": "The local shell could not resolve GitHub to download the sample files."
+  },
+  "interpretation": "V5 abstention did not improve Spell F1. V2 remains the best measured public-sample Spell F1 method. V3 improves dead-ball recall but still misses over half of public D frames; the next experiment should prioritize live-versus-stopped detection. None of these scores establishes full-match performance.",
+  "limitations": [
+    "The public sample contains only 17 possession spells and has already informed V1-V5 experiments; it is not independent validation.",
+    "Only 11.8% of the public window has missing ball coordinates, compared with about 43% across the full tactical tracking file.",
+    "The scramble proxy uses anonymous player-track speed and acceleration; it does not prove that a tackle, turnover, or stoppage occurred.",
+    "The V5 X variants inherit the D labels of their parent methods and do not address dead-ball recall.",
+    "No external Metrica sample data was used to train these models."
+  ]
+}

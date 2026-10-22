@@ -1,0 +1,8 @@
+{
+  "minimum_reacting_players_each_team": 1,
+  "minimum_total_reacting_players": 3,
+  "minimum_one_team_reacting_players": 3,
+  "one_team_speed_threshold_mps": 3.5,
+  "both_teams_speed_threshold_mps": 3.5,
+  "minimum_motion_tracks_per_team": 5
+}
