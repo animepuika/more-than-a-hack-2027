@@ -1,6 +1,6 @@
-# FirstTrial: our first local experiment
+# FirstTrial: repeatable possession experiments
 
-This experiment asks whether handling missing ball data and avoiding brief team switches improves the official baseline. It does not train a machine-learning model or search for winning settings.
+This folder keeps our experiments together, from the first nearest-player baseline through team shape, stoppage clues, physics, HMM smoothing, abstention, and public-sample training. On the public five-minute sample, V2 motion-only is the numeric Spell F1 leader at 0.3289; V2 shape-only and shape-plus-motion both score 0.3273. Those differences are tiny and their uncertainty ranges overlap. V6 improves dead-ball recall but adds false alarms and lowers Spell F1. The public sample cannot tell us who beats the published full-match baseline.
 
 ## Run it
 
@@ -152,7 +152,7 @@ It uses the tactical ATD and automatic Smart Tagging files. It adds two hypothes
 | V3 forced label + set-piece support | 81.45% | 0.2745 | 0.7867 | 34 |
 | V3 forced + set-piece + duration | 81.44% | 0.2745 | 0.7866 | 34 |
 
-The highest v3 spell score is still below the v2 shape and movement result and the official reference. Every result uses the same small public example of 17 possessions. The 90% spell-score bootstrap ranges overlap broadly, so this run does not show that any one version is the full-match winner.
+The highest v3 spell score is still below the V2 motion-only result and the official reference. Every result uses the same small public example of 17 possessions. The 90% spell-score bootstrap ranges overlap broadly, so this run does not show that any one version is the full-match winner.
 
 The new stoppage rules raised dead-ball recall from 7.3% in v2 shape plus movement to 45.3% with soft costs and 58.3% with forced labels. Forced labels also reduced dead-ball precision from 96.9% to 87.3%. The v3 variants predicted 30–34 possessions, compared with 17 in the answer, which points to extra breaks or team switches. This improves dead-ball frame detection while hurting possession-spell agreement.
 
@@ -186,14 +186,15 @@ The HMM reads the raw Home/Away/Dead cost winner and its confidence level. Its s
 | Method | Frame accuracy | Spell F1 | 5th–95th percentile range | Predicted possessions |
 |---|---:|---:|---:|---:|
 | Official reference | 71.32% | 0.3256 | 0.214–0.447 | 26 |
-| V2 shape + movement | 73.63% | **0.3273** | 0.209–0.455 | 27 |
+| V2 motion only | 69.28% | **0.3289** | 0.213–0.436 | 28 |
+| V2 shape + movement | 73.63% | 0.3273 | 0.209–0.455 | 27 |
 | V3 soft cost + set-piece support | 80.72% | 0.3083 | 0.200–0.417 | 31 |
 | V4 pitch-control reach | 69.33% | 0.1517 | 0.097–0.214 | 41 |
 | V4 HMM | 73.24% | 0.1949 | 0.123–0.267 | 61 |
 | V4 pitch control + HMM | 67.31% | 0.0379 | 0.017–0.062 | 99 |
 | V4 tagged stoppage + HMM | 80.13% | 0.1928 | 0.125–0.260 | 66 |
 
-V2 shape + movement remains the strongest tested Spell F1 method at 0.3273. Every new V4 variant produced more predicted possession periods than the 17 in the public labels. These settings are too switchy for the main metric. Pitch control alone lowered both frame accuracy and Spell F1. Combining it with this HMM was worse still. Do not add either to the main approach yet.
+V2 motion-only has the highest observed Spell F1 at 0.3289; V2 shape and shape-plus-movement both score 0.3273. The ranges overlap, so there is no clear winner. Every new V4 variant produced more predicted possession periods than the 17 in the public labels. These settings are too switchy for the main metric. Pitch control alone lowered both frame accuracy and Spell F1. Combining it with this HMM was worse still. Do not add either to the main approach yet.
 
 The public-example bootstrap ranges are wide and overlap. The sample has only 17 labelled spells and has already been used in V1–V4, so it cannot choose a full-match winner. The next useful step is to review specific wrong switches, then validate any new settings on separate labelled possessions.
 
@@ -214,12 +215,13 @@ V5 tests whether writing `X` during missing-ball frames can keep the official sp
 | Method | Accuracy | Spell F1 | Macro F1 | Predicted possessions |
 |---|---:|---:|---:|---:|
 | Official reference | 71.32% | 0.3256 | 0.6207 | 26 |
-| V2 shape + movement | 73.63% | **0.3273** | 0.5807 | 27 |
+| V2 motion-only | 69.28% | **0.3289** | 0.5475 | 28 |
+| V2 shape + movement | 73.63% | 0.3273 | 0.5807 | 27 |
 | V3 tagged soft stoppage | 80.72% | 0.3083 | **0.7635** | 31 |
 | V5 V2 + calm-gap X | 70.33% | 0.3273 | 0.5831 | 27 |
 | V5 V3 + calm-gap X | 77.43% | 0.3083 | 0.7465 | 31 |
 
-The V5 `X` policies did not raise Spell F1. Calm-gap `X` ties V2 on the public sample, while the tagged V3 parent remains below V2 on the ranking metric. We should keep V2 as the current public-sample Spell F1 leader; the test does not establish a full-match winner.
+The V5 `X` policies did not raise Spell F1. Calm-gap `X` ties the V2 shape-plus-movement parent on the public sample, while the tagged V3 parent remains below the V2 motion-only result on the ranking metric. The public-window numeric leader is V2 motion-only at 0.3289; its margin is too small to establish a reliable winner or a full-match winner.
 
 ### Dead-ball audit
 
@@ -236,3 +238,77 @@ The competition's [rules](https://github.com/metrica-sports/more-than-a-hack-202
 The external data was **not used in the V5 scores**. The local environment could not resolve GitHub to download it, so no training result is claimed. Before adding it, we should test across separate sample matches and record the source and preprocessing so the result remains reproducible.
 
 All 54 behavior tests passed, all seven outputs passed the official file-format validation, and a prediction-only repeat produced byte-identical files for all seven methods. Aggregate scores are in `results/first_trial_v5.json`; frame diagnostics and the comparison page are under ignored `data/runs/fifth_trial/`. No match data or generated frame-level outputs belong in the public repository.
+
+## Sixth experiment: learn dead-ball clues from public Metrica samples
+
+Run V6 with:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-v6.txt
+git clone --depth 1 https://github.com/metrica-sports/sample-data.git data/external/metrica-sample-data
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m solution.run_v6
+```
+
+If the sample repository is already in another folder, pass it with `--samples PATH` instead of cloning it again. Do not add the sample match files to this repository.
+
+```powershell
+.\.venv\Scripts\python.exe -m solution.run_v6 --samples PATH
+```
+
+V6 trains four candidate classifiers on three inspectable Metrica sample matches. Their event tables create **weak** dead-ball targets from stoppage events to the next restart; event times are not frame-perfect, and unmarked live frames are weak negatives. Leave-one-match-out testing keeps a whole match out of each training fold. Extra Trees had the highest dead-ball segment F1, but its lead over logistic regression was only 0.0013, so three matches do not establish a clear winner.
+
+The 63 tracking features cover ball-to-player distance (including soft 1.0 m, 1.5 m, and 3.0 m clues), pitch thirds, short path progress and efficiency, ball-boundary crossings, player speed, acceleration and braking, player convergence, team hull area and spread, and a coarse nearest-player Voronoi territory share. The Voronoi feature is not a full time-to-intercept pitch-control model. The model uses team slots rather than named player roles. It does not see the referee, ball height, body skeleton, or video; video can be used separately to review difficult examples.
+
+### V6 result on the public five minutes
+
+| Method | Public spell F1 | Macro F1 | Dead-ball precision | Dead-ball recall | Predicted possessions |
+|---|---:|---:|---:|---:|---:|
+| V2 motion-only | **0.3289** | 0.5475 | 100.0% | 7.3% | 28 |
+| V2 shape + movement | 0.3273 | 0.5807 | 100.0% | 7.3% | 27 |
+| V3 soft stoppage + tags | 0.3083 | **0.7635** | **96.1%** | 45.3% | 31 |
+| V6 learned dead ball + V2 | 0.2809 | 0.6878 | 61.3% | 39.1% | 30 |
+| V6 learned dead ball + V3 | 0.2640 | 0.7108 | 63.6% | **46.4%** | 33 |
+
+V6 catches additional `D` frames but marks too many live frames as stopped. This also fragments possession spells. **V2 motion-only is the numeric public-sample Spell F1 reference at 0.3289; V3 remains the more precise dead-ball clue.** V6 only overlaid its learned dead-ball model on the V2 shape-plus-movement and V3 parents, so it did not test the best V2 variant plus learned dead-ball logic. These are only public-window comparisons. The repository's 0.2433 score is the full-match result for its published baseline; the public-window rankings can reverse, so we have not shown that our model beats it on the private full match.
+
+The BAR-ATH tracking has the 22 on-field player tracks and 2D ball coordinates when visible. It has no separate referee track. A foul, card, fight, injury, goal, or offside cannot be confirmed from anonymous 2D player coordinates alone. Smart Tagging and video are review clues; only the supplied public match labels are used for BAR-ATH scoring, never for training.
+
+The sample files are read from the ignored local clone at `data/external/metrica-sample-data`; they are not copied into Git. The documented source is [Metrica Sports sample-data](https://github.com/metrica-sports/sample-data). Outputs are written under ignored `data/runs/sixth_trial/`; `results/first_trial_v6.json` stores aggregate scores only. Full run settings, input fingerprints, feature diagnostics, and the HTML comparison stay in that local run folder.
+
+## Before V7: what worked, what failed, and what to measure next
+
+The public BAR-ATH score covers only 7,500 frames and 17 possession spells. Use it to find problems and compare ideas, not to claim a full-match winner. The official repository's 0.2433 full-match reference score is from a different evaluation set and cannot be directly compared with these public-window scores.
+
+| Finding | Evidence | Decision |
+| --- | --- | --- |
+| V2 motion-only is the numeric Spell F1 leader | 0.3289, versus 0.3273 for V2 shape-only and shape + movement | Keep motion-only as a benchmark, but treat the 0.0016 gap as uncertain; bootstrap ranges overlap. |
+| Shape improves frame-level results | Shape + movement reached 73.63% frame accuracy versus 69.28% for motion-only | Keep shape as a separate ablation. Adding it to motion did not improve Spell F1. |
+| V3 soft tags are the best tested dead-ball clue | 96.1% D precision and 45.3% recall | Preserve as a candidate D signal, while checking restart timing. |
+| V6 learned D catches more stoppages, with too many false alarms | 39–46% D recall, about 62–64% precision, and Spell F1 of 0.264–0.281 | Do not overlay it on the main method yet; improve the event labels and entry/exit timing. |
+| HMM, pitch-control reach, and V5 X policies did not help Spell F1 | Each tested version scored below the close V2 variants | Keep the experiments documented; do not add them without a fresh gain. |
+
+V6's external model predicts **dead ball only**. It does not learn H/A possession. Its event-derived training labels run from a stoppage marker toward the next restart, so uncertain timestamps can make the model label live frames as D. With only three training matches, its 0.7197 segment F1 is almost tied with logistic regression at 0.7184, and its very high recall comes with many extra predicted segments. This is not strong evidence that Extra Trees is the right model.
+
+### What is missing
+
+- A more reliable estimate of exactly when a stoppage starts and when the restart becomes live.
+- The unrun ablation: V2 motion-only with the V6 learned dead-ball overlay.
+- More public matches with inspectable event/tracking data, evaluated by holding out whole matches.
+- A small, permitted review of public-window false D labels, missed D labels, and wrong team switches, including the event timing around each error.
+- Verified attack direction for each half before interpreting pitch thirds as attacking or defensive, or adding xT/LPV.
+- Inputs needed to prove specific events: referee track, ball height, body skeleton, reliable named identities, or confirmed event labels. Current 2D anonymous tracking cannot prove offside, handball, a goal, or why a pause happened.
+- Explicit tests for passing-lane interception, pass/shot classification, and role-specific tactics. These are ideas, not current V6 features.
+
+### Recommended experiment order
+
+```mermaid
+flowchart TD
+    A["1. Review public-window mistakes"] --> B["2. Improve stoppage and restart labels on external matches"]
+    B --> C["3. Tune a separate live/dead sequence with restart confirmation"]
+    C --> D["4. Compare motion-only, shape, and V6 overlays"]
+    D --> E["5. Hold out whole matches and report Spell F1 + D errors"]
+    E --> F["6. Decide what belongs in V7"]
+```
+
+Record the start/end error, false-D duration, possession spell count, and ball/tag/movement clues for every reviewed mistake. Change one component at a time. Do not choose by frame accuracy alone, and do not create additional BAR-ATH training labels unless the competition rules explicitly allow them.

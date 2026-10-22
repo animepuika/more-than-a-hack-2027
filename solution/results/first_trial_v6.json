@@ -1,0 +1,198 @@
+{
+  "experiment": "FirstTrial V6 \u2014 public-sample dead-ball learning and tracking geometry",
+  "scope": "Exploratory public-window evaluation: 7,500 graded BAR-ATH frames and 17 answer possession spells. This is not the private full-match leaderboard.",
+  "design": {
+    "external_source": "https://github.com/metrica-sports/sample-data",
+    "external_matches": 3,
+    "weak_target": "Event-derived dead-ball intervals from stoppage markers to the next restart; event times may be imprecise and unmarked frames are weak negatives.",
+    "training_ball_missing_rates": {
+      "Sample_Game_1": 0.391,
+      "Sample_Game_2": 0.41,
+      "Sample_Game_3": 0.322
+    },
+    "weak_dead_label_rates": {
+      "Sample_Game_1": 0.343,
+      "Sample_Game_2": 0.286,
+      "Sample_Game_3": 0.256
+    },
+    "validation": "Leave-one-whole-match-out; no BAR-ATH full-match answers used for training or selection.",
+    "features": 63,
+    "feature_groups": [
+      "ball boundary and path",
+      "ball/player proximity",
+      "pitch zones and path signatures",
+      "player velocity, acceleration and braking",
+      "team geometry and hull",
+      "coarse Voronoi territory",
+      "player convergence"
+    ],
+    "models_tested": [
+      "logistic_core",
+      "hist_core",
+      "hist_all",
+      "extra_trees_all"
+    ],
+    "selected_external_candidate": "extra_trees_all",
+    "selection_caveat": "Its out-of-fold weak-label segment F1 was 0.7197 versus 0.7184 for logistic_core; three matches are too few to claim a clear model winner."
+  },
+  "bar_ath": {
+    "frames": 199319,
+    "fps": 25,
+    "ball_visible_fraction_full_tracking": 0.569,
+    "player_tracks": 22,
+    "referee_track_available": false,
+    "ball_height_available": false
+  },
+  "public_sample_results": [
+    {
+      "method": "v2_motion",
+      "frame_accuracy": 0.6928,
+      "macro_f1": 0.547533,
+      "spell_f1": 0.328889,
+      "spell_bootstrap_90": [
+        0.213333,
+        0.435556
+      ],
+      "predicted_possessions": 28,
+      "dead_ball_precision": 1.0,
+      "dead_ball_recall": 0.072839
+    },
+    {
+      "method": "v2_shape",
+      "frame_accuracy": 0.736133,
+      "macro_f1": 0.580593,
+      "spell_f1": 0.327273,
+      "spell_bootstrap_90": [
+        0.208636,
+        0.454545
+      ],
+      "predicted_possessions": 27,
+      "dead_ball_precision": 1.0,
+      "dead_ball_recall": 0.072839
+    },
+    {
+      "method": "v2_shape_motion",
+      "frame_accuracy": 0.736267,
+      "macro_f1": 0.580681,
+      "spell_f1": 0.327273,
+      "spell_bootstrap_90": [
+        0.208636,
+        0.454545
+      ],
+      "predicted_possessions": 27,
+      "dead_ball_precision": 1.0,
+      "dead_ball_recall": 0.072839
+    },
+    {
+      "method": "reference_smooth50",
+      "frame_accuracy": 0.7132,
+      "macro_f1": 0.620733,
+      "spell_f1": 0.325581,
+      "spell_bootstrap_90": [
+        0.213953,
+        0.446512
+      ],
+      "predicted_possessions": 26,
+      "dead_ball_precision": 0.656904,
+      "dead_ball_recall": 0.213751
+    },
+    {
+      "method": "v3_tag_soft",
+      "frame_accuracy": 0.8072,
+      "macro_f1": 0.763495,
+      "spell_f1": 0.308333,
+      "spell_bootstrap_90": [
+        0.2,
+        0.417083
+      ],
+      "predicted_possessions": 31,
+      "dead_ball_precision": 0.961039,
+      "dead_ball_recall": 0.45337
+    },
+    {
+      "method": "v6_external_dead_geometry_v2",
+      "frame_accuracy": 0.751333,
+      "macro_f1": 0.690181,
+      "spell_f1": 0.280851,
+      "spell_bootstrap_90": [
+        0.161702,
+        0.4
+      ],
+      "predicted_possessions": 30,
+      "dead_ball_precision": 0.616034,
+      "dead_ball_recall": 0.397549
+    },
+    {
+      "method": "v6_external_dead_v2",
+      "frame_accuracy": 0.750133,
+      "macro_f1": 0.68779,
+      "spell_f1": 0.280851,
+      "spell_bootstrap_90": [
+        0.161702,
+        0.4
+      ],
+      "predicted_possessions": 30,
+      "dead_ball_precision": 0.612593,
+      "dead_ball_recall": 0.390742
+    },
+    {
+      "method": "v6_external_dead_v3",
+      "frame_accuracy": 0.760933,
+      "macro_f1": 0.710825,
+      "spell_f1": 0.264,
+      "spell_bootstrap_90": [
+        0.152,
+        0.376
+      ],
+      "predicted_possessions": 33,
+      "dead_ball_precision": 0.636194,
+      "dead_ball_recall": 0.464261
+    }
+  ],
+  "external_match_cross_validation": {
+    "logistic_core": {
+      "oof_segment_f1": 0.7184115523465704,
+      "oof_segment_precision": 0.5637393767705382,
+      "oof_segment_recall": 0.9900497512437811,
+      "oof_smooth_frame_f1": 0.7254990286888707,
+      "oof_average_precision": 0.7043885777656962
+    },
+    "hist_core": {
+      "oof_segment_f1": 0.6535303776683087,
+      "oof_segment_precision": 0.4877450980392157,
+      "oof_segment_recall": 0.9900497512437811,
+      "oof_smooth_frame_f1": 0.7402643458216663,
+      "oof_average_precision": 0.7221497138303878
+    },
+    "hist_all": {
+      "oof_segment_f1": 0.6546052631578947,
+      "oof_segment_precision": 0.48894348894348894,
+      "oof_segment_recall": 0.9900497512437811,
+      "oof_smooth_frame_f1": 0.7401991546889058,
+      "oof_average_precision": 0.7597694526126663
+    },
+    "extra_trees_all": {
+      "oof_segment_f1": 0.7197106690777577,
+      "oof_segment_precision": 0.5653409090909091,
+      "oof_segment_recall": 0.9900497512437811,
+      "oof_smooth_frame_f1": 0.7561876131537617,
+      "oof_average_precision": 0.7850089285123628
+    }
+  },
+  "validation": {
+    "behavior_tests_passed": 59,
+    "prediction_files_scored": 8,
+    "rows_per_prediction": 199319,
+    "bar_ath_answers_used_only_after_predictions_saved": true
+  },
+  "interpretation": "V2 motion-only is the numeric public-window Spell F1 leader at 0.328889; V2 shape-only and shape-plus-motion are close at 0.327273, with overlapping uncertainty ranges. V3 soft stoppage is the more precise D clue. V6 learned signals catch more dead-ball frames but add many false D labels and break up possession spells. V6's learned D overlay was not tested on the V2 motion-only parent. The 0.2433 full-match baseline and these public-window scores use different evaluation sets and cannot be directly compared.",
+  "limitations": [
+    "Only three public sample matches; weak event-derived frame labels may include uncertain interval timing.",
+    "The public BAR-ATH window has 17 spells; its scores can rank methods differently from the full match.",
+    "BAR-ATH tracks have no separate referee, no ball height, and anonymous fragments rather than reliable named player identity.",
+    "2D geometry cannot prove offside, handball, goal height, or the reason for a stoppage.",
+    "Pitch thirds are absolute left/middle/right; attacking/defensive labels require verified direction by half.",
+    "Voronoi area is a coarse nearest-player grid, not a complete time-to-intercept pitch-control model.",
+    "Public sample files and frame-level outputs remain local under ignored data/."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "train_stride_frames": 5,
+  "external_cv_selection_metric": "mean leave-one-match-out event-derived dead-ball segment F1",
+  "sequence_start_probability": 0.55,
+  "sequence_continue_probability": 0.35,
+  "minimum_dead_duration_s": 0.4,
+  "bridge_dead_gap_s": 0.2,
+  "boundary_confirm_frames": 2,
+  "single_frame_outside_margin_m": 0.35
+}
