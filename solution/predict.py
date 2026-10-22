@@ -7,6 +7,7 @@ No label/answer file is imported or read by this module.
 import numpy as np
 
 from .features import runs
+from .duration import decode_minimum_duration
 
 LABELS = np.array(["H", "A", "D"])
 
@@ -90,7 +91,7 @@ def stable_gap_mask(labels, features, blocks, fps, max_gap_s):
 
 
 def predict(tracking, features, blocks, config, use_stoppages=True, abstain=False,
-            extra_team_costs=None):
+            extra_team_costs=None, minimum_duration_frames=None):
     costs = evidence_costs(tracking, features, config, use_stoppages)
     if extra_team_costs is not None:
         extra_team_costs = np.asarray(extra_team_costs, dtype=float)
@@ -102,7 +103,11 @@ def predict(tracking, features, blocks, config, use_stoppages=True, abstain=Fals
     reasons = np.full(len(tracking), "outside_scored_halves", dtype="<U40")
     for _, start, last in blocks:
         stop = last + 1
-        states = decode_sequence(costs[start:stop], config["team_switch_cost"], config["dead_switch_cost"])
+        if minimum_duration_frames is None:
+            states = decode_sequence(costs[start:stop], config["team_switch_cost"], config["dead_switch_cost"])
+        else:
+            states = decode_minimum_duration(costs[start:stop], config["team_switch_cost"],
+                                             config["dead_switch_cost"], minimum_duration_frames)
         labels[start:stop] = LABELS[states]
         reasons[start:stop] = "ball_visible_ambiguous"
     active = features["active"]

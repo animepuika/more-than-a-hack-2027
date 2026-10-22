@@ -126,4 +126,36 @@ Shape accounts for nearly all the observed frame-accuracy gain. Adding movement 
 
 The official evaluator's 1,000-draw bootstrap gives broad overlapping spell-score ranges: approximately 0.209–0.455 for shape plus movement, 0.200–0.448 for v1, and 0.214–0.447 for the reference. These are not independent validation results or proof of a full-match improvement. Missed stoppages remain a major weakness, and the reference still has the highest macro F1.
 
-All 31 behavior checks passed. A complete prediction-only repeat produced identical bytes and matching hashes for all six methods. The v1 and reference predictions also match their original files exactly. The local `reproducibility.json` and `uncertainty/scoreboard.csv` preserve those checks. V2 changes and all generated match outputs remain local until another push is requested.
+All 31 behavior checks passed. A complete prediction-only repeat produced identical bytes and matching hashes for all six methods. The v1 and reference predictions also match their original files exactly. The local `reproducibility.json` and `uncertainty/scoreboard.csv` preserve those checks. V2 code is on `FirstTrial`; generated match outputs remain local.
+
+## Third experiment: dead-ball candidates and spell duration
+
+Run the fixed v3 comparison with:
+
+```powershell
+.\.venv\Scripts\python.exe -m solution.run_v3
+```
+
+It uses the tactical ATD and automatic Smart Tagging files. It adds two hypotheses: sustained low movement plus a stationary or missing ball can mark a dead-ball candidate, and minimum-duration decoding can prevent very short state changes. Set-piece tags only support a candidate when the tracking clues also agree. Each candidate is tested as a soft cost or a forced `D`, with and without the minimum-duration decoder. No public answer labels are read until every prediction has been written and hashed.
+
+| Method | Frame accuracy | Spell F1 | Macro F1 | Predicted possessions |
+|---|---:|---:|---:|---:|
+| Official reference | 71.32% | 0.3256 | 0.6207 | 26 |
+| V2 shape | 73.61% | 0.3273 | 0.5806 | 27 |
+| V2 shape + movement | 73.63% | 0.3273 | 0.5807 | 27 |
+| V3 soft dead-ball cost | 80.80% | 0.2979 | 0.7644 | 30 |
+| V3 soft cost + duration | 80.75% | 0.2979 | 0.7638 | 30 |
+| V3 forced dead-ball label | 81.96% | 0.2857 | 0.7926 | 32 |
+| V3 forced label + duration | 81.95% | 0.2857 | 0.7925 | 32 |
+| V3 soft cost + set-piece support | 80.72% | 0.3083 | 0.7635 | 31 |
+| V3 soft + set-piece + duration | 80.61% | 0.3083 | 0.7624 | 31 |
+| V3 forced label + set-piece support | 81.45% | 0.2745 | 0.7867 | 34 |
+| V3 forced + set-piece + duration | 81.44% | 0.2745 | 0.7866 | 34 |
+
+The highest v3 spell score is still below the v2 shape and movement result and the official reference. Every result uses the same small public example of 17 possessions. The 90% spell-score bootstrap ranges overlap broadly, so this run does not show that any one version is the full-match winner.
+
+The new stoppage rules raised dead-ball recall from 7.3% in v2 shape plus movement to 45.3% with soft costs and 58.3% with forced labels. Forced labels also reduced dead-ball precision from 96.9% to 87.3%. The v3 variants predicted 30–34 possessions, compared with 17 in the answer, which points to extra breaks or team switches. This improves dead-ball frame detection while hurting possession-spell agreement.
+
+The tested duration limits were 0.32 seconds for team states and 0.40 seconds for dead-ball states. They changed only 1–8 of the 7,500 graded frames and did not change spell F1 or the possession count. These settings add little beyond the existing sequence smoothing. Automatic set-piece support slightly raised the soft version's spell score, but it stayed below the reference and its bootstrap range overlaps the other methods.
+
+All 40 behavior checks passed. A prediction-only repeat produced identical bytes for all 11 methods, and the v2 shape, v2 shape plus movement, and official reference outputs exactly match their saved versions. Full outputs, frame diagnostics, and the comparison page are in ignored `data/runs/third_trial/`; the safe aggregate score export is `results/first_trial_v3.json`. Nothing was committed or pushed for v3.

@@ -1,0 +1,22 @@
+{
+  "minimum_speed_tracks": 14,
+  "quiet_median_speed_mps": 1.8,
+  "quiet_walking_fraction": 0.45,
+  "quiet_confirmation_s": 0.8,
+  "ball_cluster_window_s": 1.0,
+  "ball_cluster_coverage": 0.8,
+  "ball_cluster_diameter_m": 2.0,
+  "stationary_confirmation_s": 1.0,
+  "missing_confirmation_s": 2.0,
+  "restart_hint_confirmation_s": 0.4,
+  "restart_window_padding_s": 1.0,
+  "ball_travel_window_s": 0.4,
+  "restart_ball_speed_mps": 2.0,
+  "restart_player_speed_mps": 2.5,
+  "restart_walking_fraction": 0.35,
+  "restart_confirmation_s": 0.2,
+  "maximum_dead_hold_s": 0.8,
+  "new_dead_team_cost": 2.0,
+  "minimum_team_spell_s": 0.32,
+  "minimum_dead_spell_s": 0.4
+}

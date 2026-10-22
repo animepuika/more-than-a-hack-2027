@@ -1,0 +1,50 @@
+{
+  "experiment": "FirstTrial v3 — stoppage handling and spell stability",
+  "scope": "Exploratory scores on the same public five-minute sample used in v1 and v2; 7,500 graded frames and 17 possession spells.",
+  "design": "Eleven fixed comparisons: three reference methods plus soft or forced tracking-supported stoppages, minimum-duration decoding, and set-piece support. No parameter search or automatic winner selection.",
+  "validation": {
+    "behavior_tests_passed": 40,
+    "submission_rows_per_method": 199319,
+    "official_format_valid": true,
+    "prediction_only_repeat_identical_for_all_11_methods": true,
+    "saved_reference_and_v2_predictions_unchanged": true
+  },
+  "bootstrap": {
+    "draws": 1000,
+    "reported_percentiles": [5, 95],
+    "interpretation": "90% percentile range over the 17 public-example possession spells; not independent validation."
+  },
+  "results": [
+    {"method": "reference_smooth50", "frame_accuracy": 0.713200, "macro_f1": 0.620733, "spell_f1": 0.325581, "spell_range_90": [0.213953, 0.446512], "predicted_possessions": 26},
+    {"method": "v2_shape", "frame_accuracy": 0.736133, "macro_f1": 0.580593, "spell_f1": 0.327273, "spell_range_90": [0.208636, 0.454545], "predicted_possessions": 27},
+    {"method": "v2_shape_motion", "frame_accuracy": 0.736267, "macro_f1": 0.580681, "spell_f1": 0.327273, "spell_range_90": [0.208636, 0.454545], "predicted_possessions": 27},
+    {"method": "v3_soft", "frame_accuracy": 0.808000, "macro_f1": 0.764386, "spell_f1": 0.297872, "spell_range_90": [0.187234, 0.408511], "predicted_possessions": 30},
+    {"method": "v3_soft_duration", "frame_accuracy": 0.807467, "macro_f1": 0.763839, "spell_f1": 0.297872, "spell_range_90": [0.187234, 0.408511], "predicted_possessions": 30},
+    {"method": "v3_hard", "frame_accuracy": 0.819600, "macro_f1": 0.792647, "spell_f1": 0.285714, "spell_range_90": [0.179592, 0.391837], "predicted_possessions": 32},
+    {"method": "v3_hard_duration", "frame_accuracy": 0.819467, "macro_f1": 0.792545, "spell_f1": 0.285714, "spell_range_90": [0.179592, 0.391837], "predicted_possessions": 32},
+    {"method": "v3_tag_soft", "frame_accuracy": 0.807200, "macro_f1": 0.763495, "spell_f1": 0.308333, "spell_range_90": [0.200000, 0.417083], "predicted_possessions": 31},
+    {"method": "v3_tag_soft_duration", "frame_accuracy": 0.806133, "macro_f1": 0.762358, "spell_f1": 0.308333, "spell_range_90": [0.200000, 0.417083], "predicted_possessions": 31},
+    {"method": "v3_tag_hard", "frame_accuracy": 0.814533, "macro_f1": 0.786718, "spell_f1": 0.274510, "spell_range_90": [0.172549, 0.376471], "predicted_possessions": 34},
+    {"method": "v3_tag_hard_duration", "frame_accuracy": 0.814400, "macro_f1": 0.786616, "spell_f1": 0.274510, "spell_range_90": [0.172549, 0.376471], "predicted_possessions": 34}
+  ],
+  "component_findings": {
+    "best_spell_f1_in_v3": "v3_tag_soft",
+    "best_spell_f1_in_v3_value": 0.308333,
+    "best_prior_spell_f1": "v2_shape and v2_shape_motion at 0.327273",
+    "official_reference_spell_f1": 0.325581,
+    "v3_soft_dead_ball_precision_recall_f1": [0.969432, 0.453370, 0.617811],
+    "v3_hard_dead_ball_precision_recall_f1": [0.873469, 0.582709, 0.699061],
+    "v2_shape_motion_dead_ball_recall": 0.072839,
+    "duration_effect": "The tested 0.32 s team and 0.40 s dead-state limits changed only 1–8 graded frames. No duration variant changed spell F1 or possession count.",
+    "set_piece_support_effect": "Raised soft-cost spell F1 from 0.297872 to 0.308333, but the result remained below the reference and v2 shape methods. It lowered the forced-label spell F1 from 0.285714 to 0.274510.",
+    "interpretation": "Dead-ball frame detection improved, while possession-spell agreement declined and predicted possession counts rose. The public sample is too small to pick a full-match winner."
+  },
+  "raw_assets_and_frame_predictions_included": false,
+  "limitations": [
+    "The public sample has only 17 possessions and was already used in v1 and v2; it is not independent validation.",
+    "Automatic Smart Tagging set-piece intervals are approximate phase windows, not confirmed whistles or possession labels.",
+    "Collective stillness can mistake slow live play for a stoppage; hard D overrides can split true possession spells.",
+    "The duration decoder uses future observations and is an offline model, not a live real-time predictor.",
+    "No full-match answer labels are available; full-match accuracy and the best component mix remain unknown."
+  ]
+}
