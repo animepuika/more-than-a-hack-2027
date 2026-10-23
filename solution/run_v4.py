@@ -133,11 +133,13 @@ def pitch_control_costs(tracking, features, blocks, context_config, dead_config,
         xy, velocity, targets, tracking.home_slots, v4_config)
 
     distance = np.linalg.norm(xy - targets[:, None, :], axis=2)
-    home_distance = np.min(np.where(tracking.home_slots[None, :], distance, np.inf), axis=1)
-    away_distance = np.min(np.where((~tracking.home_slots)[None, :], distance, np.inf), axis=1)
+    finite = np.isfinite(distance)
+    home_distance = np.min(np.where(tracking.home_slots[None, :] & finite, distance, np.inf), axis=1)
+    away_distance = np.min(np.where((~tracking.home_slots)[None, :] & finite, distance, np.inf), axis=1)
     nearest = np.minimum(home_distance, away_distance)
     margin = np.abs(home_distance - away_distance)
-    strong_direct = np.isfinite(nearest) & (nearest <= base_config["control_radius_m"])
+    strong_direct = (np.isfinite(home_distance) & np.isfinite(away_distance) &
+                     (nearest <= base_config["control_radius_m"]))
     strong_direct &= margin >= base_config["control_margin_m"]
     eligible = features["active"] & supported & ~strong_direct
     costs = probability_costs(probabilities, eligible,

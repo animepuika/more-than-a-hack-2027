@@ -1,0 +1,406 @@
+{
+  "experiment": "FirstTrial v7 — repaired supervision and controlled possession changes",
+  "run_created_utc": "2026-10-22T12:37:31.215982+00:00",
+  "scope": "Exploratory evaluation on the reused public BAR-ATH five-minute sample: 7500 graded frames and 17 answer possession spells. No private full-match result.",
+  "design": {
+    "external_source": "https://github.com/metrica-sports/sample-data",
+    "external_matches": 3,
+    "trained_target": "Dead ball only; event-derived weak labels. Unknown/conflicting intervals and 0.2-second boundaries masked.",
+    "external_validation": "Leave one whole match out. Select between two model families on the same three folds; no independent final external test.",
+    "selected_external_candidate": "extra_trees",
+    "selection_metric": "unweighted mean held-out-match dead interval F1 averaged at IoU 0.3, 0.5, 0.7; masked labels, fixed thresholds",
+    "transfer_model": "Rules for confirmed control with owner memory; not supervised H/A learning.",
+    "variants": {
+      "reference_smooth50": "Unchanged official reference.",
+      "v2_shape": "Unchanged V2 shape reference.",
+      "v2_motion": "Unchanged V2 motion reference.",
+      "v2_shape_motion": "Unchanged V2 shape plus motion reference.",
+      "v3_tag_soft": "Unchanged V3 soft stoppage/tag reference.",
+      "v7_transfer": "Confirmed control transfers; retains V2 shape/motion dead periods.",
+      "v7_dead_v2": "Repaired learned D overlay only, on V2 shape/motion.",
+      "v7_dead_motion": "Missing ablation: repaired learned D overlay on V2 motion-only.",
+      "v7_joint": "Factorized team/dead sequence with control memory and reset after D.",
+      "v7_joint_context": "Joint model plus weak team shape/motion conditional evidence.",
+      "v7_joint_tags": "Joint model plus automatic restart windows corroborated by tracking."
+    }
+  },
+  "validation": {
+    "behavior_tests_passed": 73,
+    "valid_rows_per_prediction": 199319,
+    "prediction_files": 11,
+    "prediction_hashes_recorded_before_public_scoring": true,
+    "reference_files_byte_identical_to_previous_run": {
+      "reference_smooth50": true,
+      "v2_shape": true,
+      "v2_motion": true,
+      "v2_shape_motion": true,
+      "v3_tag_soft": true
+    },
+    "code_hashes_match_completed_run": true,
+    "v4_nan_distance_guard_fixed": true,
+    "historical_v4_scores_rerun": false
+  },
+  "public_sample_results": [
+    {
+      "method": "reference_smooth50",
+      "frame_accuracy": 0.7132,
+      "macro_f1": 0.620733,
+      "spell_f1": 0.325581,
+      "spell_bootstrap_90": [
+        0.213953,
+        0.446512
+      ],
+      "predicted_possessions": 26,
+      "dead_ball_precision": 0.656904,
+      "dead_ball_recall": 0.213751
+    },
+    {
+      "method": "v2_shape",
+      "frame_accuracy": 0.736133,
+      "macro_f1": 0.580593,
+      "spell_f1": 0.327273,
+      "spell_bootstrap_90": [
+        0.208636,
+        0.454545
+      ],
+      "predicted_possessions": 27,
+      "dead_ball_precision": 1.0,
+      "dead_ball_recall": 0.072839
+    },
+    {
+      "method": "v2_motion",
+      "frame_accuracy": 0.6928,
+      "macro_f1": 0.547533,
+      "spell_f1": 0.328889,
+      "spell_bootstrap_90": [
+        0.213333,
+        0.435556
+      ],
+      "predicted_possessions": 28,
+      "dead_ball_precision": 1.0,
+      "dead_ball_recall": 0.072839
+    },
+    {
+      "method": "v2_shape_motion",
+      "frame_accuracy": 0.736267,
+      "macro_f1": 0.580681,
+      "spell_f1": 0.327273,
+      "spell_bootstrap_90": [
+        0.208636,
+        0.454545
+      ],
+      "predicted_possessions": 27,
+      "dead_ball_precision": 1.0,
+      "dead_ball_recall": 0.072839
+    },
+    {
+      "method": "v3_tag_soft",
+      "frame_accuracy": 0.8072,
+      "macro_f1": 0.763495,
+      "spell_f1": 0.308333,
+      "spell_bootstrap_90": [
+        0.2,
+        0.417083
+      ],
+      "predicted_possessions": 31,
+      "dead_ball_precision": 0.961039,
+      "dead_ball_recall": 0.45337
+    },
+    {
+      "method": "v7_transfer",
+      "frame_accuracy": 0.708,
+      "macro_f1": 0.56026,
+      "spell_f1": 0.411765,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ],
+      "predicted_possessions": 17,
+      "dead_ball_precision": 1.0,
+      "dead_ball_recall": 0.072839
+    },
+    {
+      "method": "v7_dead_v2",
+      "frame_accuracy": 0.7524,
+      "macro_f1": 0.690564,
+      "spell_f1": 0.280851,
+      "spell_bootstrap_90": [
+        0.161702,
+        0.4
+      ],
+      "predicted_possessions": 30,
+      "dead_ball_precision": 0.612223,
+      "dead_ball_recall": 0.395507
+    },
+    {
+      "method": "v7_dead_motion",
+      "frame_accuracy": 0.7392,
+      "macro_f1": 0.681249,
+      "spell_f1": 0.283333,
+      "spell_bootstrap_90": [
+        0.175,
+        0.391667
+      ],
+      "predicted_possessions": 31,
+      "dead_ball_precision": 0.612223,
+      "dead_ball_recall": 0.395507
+    },
+    {
+      "method": "v7_joint",
+      "frame_accuracy": 0.7196,
+      "macro_f1": 0.651062,
+      "spell_f1": 0.379487,
+      "spell_bootstrap_90": [
+        0.25641,
+        0.502564
+      ],
+      "predicted_possessions": 22,
+      "dead_ball_precision": 0.565367,
+      "dead_ball_recall": 0.335602
+    },
+    {
+      "method": "v7_joint_context",
+      "frame_accuracy": 0.7196,
+      "macro_f1": 0.651062,
+      "spell_f1": 0.379487,
+      "spell_bootstrap_90": [
+        0.25641,
+        0.502564
+      ],
+      "predicted_possessions": 22,
+      "dead_ball_precision": 0.565367,
+      "dead_ball_recall": 0.335602
+    },
+    {
+      "method": "v7_joint_tags",
+      "frame_accuracy": 0.7196,
+      "macro_f1": 0.651062,
+      "spell_f1": 0.379487,
+      "spell_bootstrap_90": [
+        0.25641,
+        0.502564
+      ],
+      "predicted_possessions": 22,
+      "dead_ball_precision": 0.565367,
+      "dead_ball_recall": 0.335602
+    }
+  ],
+  "external_weak_label_cross_validation": {
+    "logistic": {
+      "mean_match_interval_f1": 0.9208198928304833,
+      "mean_match_dead_frame_f1": 0.9794828931462853,
+      "mean_match_false_dead_s": 19.680000000000003,
+      "pooled": {
+        "known_frames": 394249,
+        "dead_precision": 0.989433065341743,
+        "dead_recall": 0.9676662722390651,
+        "dead_frame_f1": 0.9784286240194829,
+        "false_dead_s": 59.04,
+        "missed_dead_s": 184.72,
+        "brier_on_weak_labels": 0.014457276090979576,
+        "interval_f1_mean": 0.9210220673635309,
+        "by_iou": {
+          "0.3": {
+            "f1": 0.926829268292683,
+            "matched": 266,
+            "target_segments": 278,
+            "predicted_segments": 296,
+            "mean_start_error_s": 0.04150375939849624,
+            "mean_end_error_s": 0.0004511278195488722
+          },
+          "0.5": {
+            "f1": 0.9198606271777003,
+            "matched": 264,
+            "target_segments": 278,
+            "predicted_segments": 296,
+            "mean_start_error_s": 0.03166666666666666,
+            "mean_end_error_s": 0.00045454545454545455
+          },
+          "0.7": {
+            "f1": 0.9163763066202091,
+            "matched": 263,
+            "target_segments": 278,
+            "predicted_segments": 296,
+            "mean_start_error_s": 0.029809885931558935,
+            "mean_end_error_s": 0.00045627376425855514
+          }
+        }
+      },
+      "folds": [
+        {
+          "held_out": "0",
+          "known_frames": 130818,
+          "dead_precision": 0.9906752346394762,
+          "dead_recall": 0.920305820763422,
+          "dead_frame_f1": 0.9541948962258625,
+          "false_dead_s": 18.4,
+          "missed_dead_s": 169.28,
+          "brier_on_weak_labels": 0.03531520813703537,
+          "interval_f1_mean": 0.8994708994708994
+        },
+        {
+          "held_out": "1",
+          "known_frames": 126815,
+          "dead_precision": 0.989864794699786,
+          "dead_recall": 0.9970711909792682,
+          "dead_frame_f1": 0.9934549244398124,
+          "false_dead_s": 19.52,
+          "missed_dead_s": 5.6,
+          "brier_on_weak_labels": 0.003932144958525896,
+          "interval_f1_mean": 0.9283154121863798
+        },
+        {
+          "held_out": "2",
+          "known_frames": 136616,
+          "dead_precision": 0.9874884481410393,
+          "dead_recall": 0.9941315393974093,
+          "dead_frame_f1": 0.9907988587731812,
+          "false_dead_s": 21.12,
+          "missed_dead_s": 9.84,
+          "brier_on_weak_labels": 0.004254598170518875,
+          "interval_f1_mean": 0.9346733668341708
+        }
+      ]
+    },
+    "extra_trees": {
+      "mean_match_interval_f1": 0.934918558181669,
+      "mean_match_dead_frame_f1": 0.9804061624181667,
+      "mean_match_false_dead_s": 19.213333333333335,
+      "pooled": {
+        "known_frames": 394249,
+        "dead_precision": 0.9896942606829966,
+        "dead_recall": 0.9689195717776549,
+        "dead_frame_f1": 0.9791967394073193,
+        "false_dead_s": 57.64,
+        "missed_dead_s": 177.56,
+        "brier_on_weak_labels": 0.014412823133170605,
+        "interval_f1_mean": 0.9354647720544701,
+        "by_iou": {
+          "0.3": {
+            "f1": 0.9378330373001776,
+            "matched": 264,
+            "target_segments": 278,
+            "predicted_segments": 285,
+            "mean_start_error_s": 0.009090909090909092,
+            "mean_end_error_s": 0.00030303030303030303
+          },
+          "0.5": {
+            "f1": 0.9342806394316163,
+            "matched": 263,
+            "target_segments": 278,
+            "predicted_segments": 285,
+            "mean_start_error_s": 0.002585551330798479,
+            "mean_end_error_s": 0.0003041825095057034
+          },
+          "0.7": {
+            "f1": 0.9342806394316163,
+            "matched": 263,
+            "target_segments": 278,
+            "predicted_segments": 285,
+            "mean_start_error_s": 0.002585551330798479,
+            "mean_end_error_s": 0.0003041825095057034
+          }
+        }
+      },
+      "folds": [
+        {
+          "held_out": "0",
+          "known_frames": 130818,
+          "dead_precision": 0.9903229733019557,
+          "dead_recall": 0.9192512664067943,
+          "dead_frame_f1": 0.953464524634992,
+          "false_dead_s": 19.08,
+          "missed_dead_s": 171.52,
+          "brier_on_weak_labels": 0.03580723702907562,
+          "interval_f1_mean": 0.900900900900901
+        },
+        {
+          "held_out": "1",
+          "known_frames": 126815,
+          "dead_precision": 0.987341248500393,
+          "dead_recall": 0.9985983556829355,
+          "dead_frame_f1": 0.9929378971782791,
+          "false_dead_s": 24.48,
+          "missed_dead_s": 2.68,
+          "brier_on_weak_labels": 0.004565905313938856,
+          "interval_f1_mean": 0.9347826086956522
+        },
+        {
+          "held_out": "2",
+          "known_frames": 136616,
+          "dead_precision": 0.9916561974067841,
+          "dead_recall": 0.9979961354039935,
+          "dead_frame_f1": 0.9948160654412289,
+          "false_dead_s": 14.08,
+          "missed_dead_s": 3.36,
+          "brier_on_weak_labels": 0.003066881326958537,
+          "interval_f1_mean": 0.9690721649484536
+        }
+      ]
+    }
+  },
+  "external_label_audit": [
+    {
+      "match": "Sample_Game_1",
+      "frames": 145006,
+      "weak_live": 77715,
+      "weak_dead": 53103,
+      "unknown": 14188,
+      "conflict_frames_excluded": 7,
+      "boundary_frames_excluded": 2033,
+      "stop_to_action_candidates": 93,
+      "pass_starts_labeled_dead": 0,
+      "boundary_margin_s": 0.2,
+      "maximum_live_bridge_s": 8.0
+    },
+    {
+      "match": "Sample_Game_2",
+      "frames": 141156,
+      "weak_live": 79014,
+      "weak_dead": 47801,
+      "unknown": 14341,
+      "conflict_frames_excluded": 10,
+      "boundary_frames_excluded": 2003,
+      "stop_to_action_candidates": 92,
+      "pass_starts_labeled_dead": 0,
+      "boundary_margin_s": 0.2,
+      "maximum_live_bridge_s": 8.0
+    },
+    {
+      "match": "Sample_Game_3",
+      "frames": 143761,
+      "weak_live": 94697,
+      "weak_dead": 41919,
+      "unknown": 7145,
+      "conflict_frames_excluded": 14,
+      "boundary_frames_excluded": 2122,
+      "stop_to_action_candidates": 97,
+      "pass_starts_labeled_dead": 0,
+      "boundary_margin_s": 0.2,
+      "maximum_live_bridge_s": 8.0
+    }
+  ],
+  "takeaways": [
+    "v7_transfer has the highest observed public Spell F1: 0.411765 vs previous best v2_motion 0.328889; +0.082876, about 25.2% relative.",
+    "The gain is from control-transfer logic. This variant retains the V2 shape/motion dead periods and still misses about 92.7% of public D frames.",
+    "The joint decoder reaches 0.379487 with more D recall but false stoppages. Context and tags add no public-window score gain.",
+    "External weak-label model scores do not establish reliable dead-ball transfer to BAR-ATH.",
+    "Best public candidate is not a proven full-match winner; bootstrap ranges overlap and this public window was repeatedly inspected."
+  ],
+  "next_priorities": [
+    "Improve stop/restart boundaries, including stoppages with a visible ball.",
+    "Get permitted unseen validation and inspect long missing-ball intervals.",
+    "Validate components independently before adding further model complexity."
+  ],
+  "limitations": [
+    "BAR-ATH public scores reuse only five minutes and 17 possessions; no full-match winner is established.",
+    "External targets remain event-derived weak labels; unknown/conflicting spans and 0.2-second boundaries are masked.",
+    "External interval metrics score labeled interiors, not timing inside masked boundaries; they are not official possession Spell F1.",
+    "Two model families are selected on the same three external held-out matches; this is model-selection evidence, not a separate final test.",
+    "Classifier scores are not calibrated BAR-ATH probabilities. Fixed thresholds and transfer timing are engineering choices, not publicly tuned.",
+    "No additional video, broadcast fusion, referee trajectory, player identity or ball height is used.",
+    "Control-memory transfer inference is not supervised on external H/A possession answers. D is the externally trained component.",
+    "All methods are offline: future observations confirm control boundaries and centered feature windows are used.",
+    "V4 finite-distance guard is repaired in source; historical V4 results remain historical and are not rerun here."
+  ]
+}

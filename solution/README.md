@@ -1,6 +1,6 @@
 # FirstTrial: repeatable possession experiments
 
-This folder keeps our experiments together, from the first nearest-player baseline through team shape, stoppage clues, physics, HMM smoothing, abstention, and public-sample training. On the public five-minute sample, V2 motion-only is the numeric Spell F1 leader at 0.3289; V2 shape-only and shape-plus-motion both score 0.3273. Those differences are tiny and their uncertainty ranges overlap. V6 improves dead-ball recall but adds false alarms and lowers Spell F1. The public sample cannot tell us who beats the published full-match baseline.
+This folder keeps our experiments together, from the first nearest-player baseline through team shape, stoppage clues, physics, HMM smoothing, abstention, and external-sample training. V7's confirmed-control method now has the highest observed Spell F1 on the public five minutes: **0.4118**, up from V2 motion-only's **0.3289** (+0.0829, about 25.2% relative). Its frame accuracy is 70.80%, and it still misses most dead-ball frames. The reused sample has only 17 possession spells; it cannot establish a full-match winner. See the V7 section below for comparisons and limitations. Earlier sections record the experiments as they stood at the time.
 
 ## Run it
 
@@ -278,6 +278,8 @@ The sample files are read from the ignored local clone at `data/external/metrica
 
 ## Before V7: what worked, what failed, and what to measure next
 
+Historical planning record. The completed V7 section below supersedes its next-step recommendations and corrects the external-label and interval-scoring defects found in the audit.
+
 The public BAR-ATH score covers only 7,500 frames and 17 possession spells. Use it to find problems and compare ideas, not to claim a full-match winner. The official repository's 0.2433 full-match reference score is from a different evaluation set and cannot be directly compared with these public-window scores.
 
 | Finding | Evidence | Decision |
@@ -312,3 +314,55 @@ flowchart TD
 ```
 
 Record the start/end error, false-D duration, possession spell count, and ball/tag/movement clues for every reviewed mistake. Change one component at a time. Do not choose by frame accuracy alone, and do not create additional BAR-ATH training labels unless the competition rules explicitly allow them.
+
+## Seventh experiment: repaired supervision and confirmed possession changes
+
+V7 tests two external dead-ball classifiers and six fixed prediction variants alongside five unchanged controls. The main gain comes from **waiting for evidence of sustained control before changing the owning team**. A brief approach by an opponent no longer automatically becomes a possession change.
+
+### Run V7
+
+Use the existing three-match sample-data checkout described under V6, or supply its path:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-v7.txt
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m solution.run_v7 --samples data/external/metrica-sample-data
+```
+
+The default output is `data/runs/seventh_trial/`. To repeat without scoring, choose a fresh output folder and add `--skip-score`. Cached external features are keyed by configuration, source and input hashes. Training, predictions, diagnostics, serialized models and comparison pages remain local and ignored by Git; `results/first_trial_v7.json` contains aggregate evidence only.
+
+### What changed
+
+- **Possession changes:** require 0.6 seconds of clear control, allowing only brief observation holes. Once confirmed, backdate the change to its first supporting frame. Keep the previous owner through loose-ball intervals and reset at a detected dead period or half boundary. This is an offline rule, not supervised Home/Away training.
+- **External labels:** recognize the next credible ball action as a possible restart, including recovery and goal-kick passes. Mask unknown periods, conflicting labels and uncertain boundaries. Audited pass starts inside dead targets fell from 161 in V6 to zero in V7. These remain event-derived weak labels, not corrected possession answers.
+- **Tracking safeguards:** process periods separately; cap implausible speed/acceleration; reject insufficient team coverage; expire last-ball position after one second; use team-symmetric dead-ball features.
+- **Evaluation:** hold out one complete external match at a time. Match dead intervals by overlap at IoU thresholds 0.3, 0.5 and 0.7, within known-label regions. V6's any-overlap segment score was too permissive and must not be compared with this score.
+- **Joint experiment:** combine team evidence and dead-ball evidence in one sequence, then apply control memory within live episodes. Separate variants test weak team context and tracking-supported restart tags.
+- **V4 repair:** ignore missing player distances when finding a team's nearest player. Historical V4 results are unchanged and have not been rerun with this fix.
+
+### Results on the same public five minutes
+
+| Method | Spell F1 | Frame accuracy | D precision | D recall | Predicted possessions |
+|---|---:|---:|---:|---:|---:|
+| V2 motion-only control | 0.3289 | 69.28% | 100.0% | 7.3% | 28 |
+| V3 soft tags control | 0.3083 | 80.72% | 96.1% | 45.3% | 31 |
+| **V7 confirmed control** | **0.4118** | 70.80% | 100.0% | 7.3% | 17 |
+| V7 learned D + V2 shape/motion | 0.2809 | 75.24% | 61.2% | 39.6% | 30 |
+| V7 learned D + V2 motion | 0.2833 | 73.92% | 61.2% | 39.6% | 31 |
+| V7 joint team/dead sequence | 0.3795 | 71.96% | 56.5% | 33.6% | 22 |
+| V7 joint + weak team context | 0.3795 | 71.96% | 56.5% | 33.6% | 22 |
+| V7 joint + supported restart tags | 0.3795 | 71.96% | 56.5% | 33.6% | 22 |
+
+The transfer variant retains the V2 shape/motion dead periods. Its gain is in possession continuity, **not** dead-ball detection. Predicting 17 possessions does not mean all 17 are correct. Context and tags produced no public-window score gain; that does not establish their value across the full match.
+
+Extra Trees led the external model-selection comparison at **0.9349 mean dead-interval F1**, versus **0.9208** for logistic regression. Those scores measure agreement with masked weak labels on three held-out matches. They are not official Spell F1, not BAR-ATH accuracy, and not independent final-test results. Scores are uncalibrated. The public BAR-ATH learned-D results show that strong external weak-label scores did not translate into a strong possession solution.
+
+### Evidence and decision
+
+- All **73 behavior tests passed**. Every method produced a valid 199,319-row prediction file.
+- The five reference prediction files are byte-identical to their prior V6-run equivalents.
+- The completed run's recorded code hashes match the implementation. Prediction hashes were recorded before the official public scorer ran.
+- The official 90% bootstrap range is **0.271–0.553** for V7 transfer and **0.213–0.436** for V2 motion. These overlap; the repeatedly inspected five-minute window is exploratory evidence.
+- The full graded match has about 40.7% missing-ball frames, versus 11.8% in the public window. Long gaps remain poorly validated.
+
+**Current candidate:** retain `v7_transfer` as the best observed public-sample method. Keep `v7_joint` as a comparison, not a proven upgrade. Next priorities are accurate stop/restart timing (including stops with a visible ball), separate unseen validation, and testing long missing-ball intervals. Do not add more components merely because their external weak-label score is high. No full-match result or exhaustive best combination is established.
