@@ -1,6 +1,6 @@
 # FirstTrial: repeatable possession experiments
 
-This folder keeps our experiments together, from the first nearest-player baseline through team shape, stoppage clues, physics, HMM smoothing, abstention, and external-sample training. V7's confirmed-control method now has the highest observed Spell F1 on the public five minutes: **0.4118**, up from V2 motion-only's **0.3289** (+0.0829, about 25.2% relative). Its frame accuracy is 70.80%, and it still misses most dead-ball frames. The reused sample has only 17 possession spells; it cannot establish a full-match winner. See the V7 section below for comparisons and limitations. Earlier sections record the experiments as they stood at the time.
+This folder keeps our experiments together, from the first nearest-player baseline through team shape, stoppage clues, physics, HMM smoothing, abstention, and external-sample training. The highest observed Spell F1 on the public five minutes remains **0.4118**, reached by V7 confirmed control and tied by V8's ball-based variants. V8 adds nine correct dead-ball frames and one false dead-ball frame, raising frame accuracy from 70.80% to 70.91%, but does not improve Spell F1. The reused sample has only 17 possession spells; it cannot establish a full-match winner. See the V7/V8 sections below for comparisons and limitations. Earlier sections record the experiments as they stood at the time.
 
 ## Run it
 
@@ -366,3 +366,51 @@ Extra Trees led the external model-selection comparison at **0.9349 mean dead-in
 - The full graded match has about 40.7% missing-ball frames, versus 11.8% in the public window. Long gaps remain poorly validated.
 
 **Current candidate:** retain `v7_transfer` as the best observed public-sample method. Keep `v7_joint` as a comparison, not a proven upgrade. Next priorities are accurate stop/restart timing (including stops with a visible ball), separate unseen validation, and testing long missing-ball intervals. Do not add more components merely because their external weak-label score is high. No full-match result or exhaustive best combination is established.
+
+## Eighth experiment: use ball evidence and earlier ideas more carefully
+
+V8 revisits the brainstorm with six fixed comparisons and three unchanged controls. No new classifier is trained, and no settings are changed after reading the public scores. Run it after generating V7; the runner checks its source, input, configuration and prediction hashes before reusing its controls. The existing V7 dependencies are sufficient.
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m solution.run_v8
+```
+
+Use `--reference-run PATH` for another completed V7 run, `--samples PATH` for the Metrica sample checkout, and a fresh `--out data/runs/NAME` for repeats. `--skip-score` generates predictions without reading public answers.
+
+### Brainstorm ideas reconsidered
+
+| Idea | V8 treatment | Remaining uncertainty |
+|---|---|---|
+| Ball stationary for several seconds | Robust two-second position span, allowing limited jitter/short gaps; a nearby taker no longer vetoes a stop | A stationary ball can be live; a dead ball can be carried or repositioned |
+| Out of bounds | Confirm observed boundary exits with a radius plus tracking-error margin | Missing exit frames and calibration remain problems; margins are model settings |
+| Slow players and tactical disruption | Supporting evidence with minimum tracking coverage, never a missingness-only stop rule | Quiet play can be live; coordinates do not identify cards, fights or injuries |
+| Pressing/convergence | Test a veto when both teams are nearby and a player closes quickly | Useful caution for a possible duel, not proof of a legal tackle or foul |
+| Soft set-piece tags | Require stable-ball/quiet support; separately reuse V3's existing dead periods with V7 ownership | A tag can cover preparation, the restart and live play |
+| Stop/restart persistence | Compare short continuation against five-second bounded memory; require directed ball travel plus supporting motion/separation for restart | A returned ball can still look like a restart; timing remains uncalibrated |
+| Shape, roles, pitch control and X | Preserve historical experiments; no additional changes in this run | Named identities, attack direction, independent validation and reliable event labels still limit these ideas |
+
+### Public results
+
+| Method | Spell F1 | Frame accuracy | D precision | D recall |
+|---|---:|---:|---:|---:|
+| V7 confirmed control | **0.4118** | 70.80% | 100.0% | 7.3% |
+| V8 boundary extension | **0.4118** | 70.91% | 99.1% | 7.9% |
+| V8 + stationary / restart / pressure / supported tags | **0.4118** | 70.91% | 99.1% | 7.9% |
+| V3 dead periods + V7 confirmed control | 0.3795 | 77.89% | 96.1% | 45.3% |
+| V3 soft tags control | 0.3083 | 80.72% | 96.1% | 45.3% |
+| V7 joint control | 0.3795 | 71.96% | 56.5% | 33.6% |
+
+The boundary extension adds **9 true D frames and 1 false D frame**: eight additional correct labels out of 7,500. The other new rules make no further prediction changes in this public window, although they produce different predictions elsewhere. This is a small frame-level improvement, not an improvement in the main score. The V3/V7 combination improves its V3 parent's Spell F1, but remains below V7 transfer.
+
+Standalone rules were also checked against approximate event targets on all three external sample matches. Their recall is low. The pressure veto reduces false-D seconds on each match (57.84 to 42.76; 37.04 to 29.32; 33.52 to 30.32), without establishing a reliable full-match model. These checks train nothing, use no event inputs to predict, and are not official possession scoring.
+
+### What the missed intervals show
+
+- Two public D intervals have reliable ball observations in only about **7% and 20%** of their frames. A visible-stationary-ball rule cannot describe most of them.
+- A **20.44-second** D interval has reliable ball positions throughout. Its two-second robust position span has a **4.94 m median**, never below **1.25 m**. It fails the fixed 0.85 m stability condition despite mostly quiet players. This is recorded motion; video would be needed to distinguish real ball handling from tracking error.
+- A **14.48-second** D interval is also fully visible, but its median two-second span is **2.70 m**. Observed boundary evidence catches only part of it.
+
+The next hypothesis is a richer distinction between **live play, ball retrieval/repositioning, restart preparation and the actual restart**. First validate those patterns on permitted external examples, including visible-ball stoppages. Do not simply loosen the threshold until these four inspected public pauses fit.
+
+**Verified:** 84 tests passed; all nine methods have valid 199,319-row files; the three reference files are byte-identical to V7; the lightweight features reproduce V7 ownership exactly. Source/prediction hashes were frozen before scoring. Aggregate results are in `results/first_trial_v8.json`. Local outputs are under `data/runs/eighth_trial/`, including `comparison.html`, `external_rule_checks.json`, `deadball_review.json` and `stop_criteria_review.json`.

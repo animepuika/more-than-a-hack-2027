@@ -1,0 +1,311 @@
+{
+  "experiment": "FirstTrial v8 \u2014 ball stability, restart memory and reused V3 stoppages",
+  "run_created_utc": "2026-10-23T19:33:26.495113+00:00",
+  "scope": "Exploratory reuse of public five-minute BAR-ATH sample; no full-match accuracy or independent validation claim.",
+  "design": "Six fixed V8 variants and three hash-verified controls. No fitting or parameter search. Fixed rules checked on three external matches before BAR-ATH scoring.",
+  "config": {
+    "stationary_window_s": 2.0,
+    "stationary_span_m": 0.85,
+    "stationary_coverage": 0.8,
+    "stationary_quantile": 0.1,
+    "stationary_max_gap_s": 0.24,
+    "stationary_confirmation_s": 0.4,
+    "minimum_speed_tracks": 12,
+    "quiet_median_speed_mps": 1.8,
+    "quiet_walking_fraction": 0.45,
+    "quiet_window_fraction": 0.65,
+    "ball_radius_m": 0.11,
+    "boundary_uncertainty_m": 0.25,
+    "outside_confirmation_s": 0.24,
+    "brief_hold_s": 0.4,
+    "persistent_hold_s": 5.0,
+    "travel_window_s": 0.6,
+    "restart_speed_mps": 4.0,
+    "restart_fast_speed_mps": 8.0,
+    "restart_player_speed_mps": 1.8,
+    "restart_ball_separation_m": 2.0,
+    "restart_path_efficiency": 0.65,
+    "restart_confirmation_s": 0.2,
+    "restart_cooldown_s": 0.8,
+    "pressure_radius_m": 4.0,
+    "pressure_closing_speed_mps": 1.5,
+    "pressure_window_fraction": 0.2,
+    "tag_stationary_span_m": 1.7,
+    "tag_quiet_window_fraction": 0.35,
+    "tag_confirmation_s": 0.6,
+    "tag_padding_s": 1.0
+  },
+  "validation": {
+    "behavior_tests_passed": 84,
+    "rows_per_prediction": 199319,
+    "prediction_files": 9,
+    "official_format_valid_all_methods": true,
+    "reference_files_byte_identical": {
+      "v7_transfer": true,
+      "v7_joint": true,
+      "v3_tag_soft": true
+    },
+    "v7_control_reproduced_from_light_features": true,
+    "public_predictions_identical_to_boundary_variant": {
+      "v8_stationary": true,
+      "v8_restart": true,
+      "v8_pressure": true,
+      "v8_tags": true
+    },
+    "code_hashes_match_completed_run": true,
+    "predictions_frozen_before_public_scoring": true
+  },
+  "public_sample_results": [
+    {
+      "method": "v8_boundary",
+      "spell_f1": 0.411765,
+      "frame_accuracy": 0.709067,
+      "macro_f1": 0.564033,
+      "dead_ball_precision": 0.991453,
+      "dead_ball_recall": 0.078965,
+      "predicted_possessions": 17,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ]
+    },
+    {
+      "method": "v8_pressure",
+      "spell_f1": 0.411765,
+      "frame_accuracy": 0.709067,
+      "macro_f1": 0.564033,
+      "dead_ball_precision": 0.991453,
+      "dead_ball_recall": 0.078965,
+      "predicted_possessions": 17,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ]
+    },
+    {
+      "method": "v8_restart",
+      "spell_f1": 0.411765,
+      "frame_accuracy": 0.709067,
+      "macro_f1": 0.564033,
+      "dead_ball_precision": 0.991453,
+      "dead_ball_recall": 0.078965,
+      "predicted_possessions": 17,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ]
+    },
+    {
+      "method": "v8_stationary",
+      "spell_f1": 0.411765,
+      "frame_accuracy": 0.709067,
+      "macro_f1": 0.564033,
+      "dead_ball_precision": 0.991453,
+      "dead_ball_recall": 0.078965,
+      "predicted_possessions": 17,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ]
+    },
+    {
+      "method": "v8_tags",
+      "spell_f1": 0.411765,
+      "frame_accuracy": 0.709067,
+      "macro_f1": 0.564033,
+      "dead_ball_precision": 0.991453,
+      "dead_ball_recall": 0.078965,
+      "predicted_possessions": 17,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ]
+    },
+    {
+      "method": "v7_transfer",
+      "spell_f1": 0.411765,
+      "frame_accuracy": 0.708,
+      "macro_f1": 0.56026,
+      "dead_ball_precision": 1.0,
+      "dead_ball_recall": 0.072839,
+      "predicted_possessions": 17,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ]
+    },
+    {
+      "method": "v8_v3_control",
+      "spell_f1": 0.379487,
+      "frame_accuracy": 0.778933,
+      "macro_f1": 0.742414,
+      "dead_ball_precision": 0.961039,
+      "dead_ball_recall": 0.45337,
+      "predicted_possessions": 22,
+      "spell_bootstrap_90": [
+        0.246154,
+        0.502564
+      ]
+    },
+    {
+      "method": "v7_joint",
+      "spell_f1": 0.379487,
+      "frame_accuracy": 0.7196,
+      "macro_f1": 0.651062,
+      "dead_ball_precision": 0.565367,
+      "dead_ball_recall": 0.335602,
+      "predicted_possessions": 22,
+      "spell_bootstrap_90": [
+        0.25641,
+        0.502564
+      ]
+    },
+    {
+      "method": "v3_tag_soft",
+      "spell_f1": 0.308333,
+      "frame_accuracy": 0.8072,
+      "macro_f1": 0.763495,
+      "dead_ball_precision": 0.961039,
+      "dead_ball_recall": 0.45337,
+      "predicted_possessions": 31,
+      "spell_bootstrap_90": [
+        0.2,
+        0.417083
+      ]
+    }
+  ],
+  "external_rule_checks": {
+    "Sample_Game_1": {
+      "v8_boundary": {
+        "known_frames": 130818,
+        "dead_precision": 0.3161512027491409,
+        "dead_recall": 0.0017324821573169124,
+        "dead_frame_f1": 0.0034460800839045585,
+        "false_dead_s": 7.96,
+        "missed_dead_s": 2120.44,
+        "interval_f1_mean": 0.004597701149425287
+      },
+      "v8_stationary": {
+        "known_frames": 130818,
+        "dead_precision": 0.7862431800467654,
+        "dead_recall": 0.07598440766058415,
+        "dead_frame_f1": 0.13857645745685584,
+        "false_dead_s": 43.88,
+        "missed_dead_s": 1962.72,
+        "interval_f1_mean": 0.016359918200409
+      },
+      "v8_restart": {
+        "known_frames": 130818,
+        "dead_precision": 0.8414995067412036,
+        "dead_recall": 0.14456810349697757,
+        "dead_frame_f1": 0.24674573329476424,
+        "false_dead_s": 57.84,
+        "missed_dead_s": 1817.04,
+        "interval_f1_mean": 0.09836065573770492
+      },
+      "v8_pressure": {
+        "known_frames": 130818,
+        "dead_precision": 0.8756253635834788,
+        "dead_recall": 0.1417245729996422,
+        "dead_frame_f1": 0.24396252714836786,
+        "false_dead_s": 42.76,
+        "missed_dead_s": 1823.08,
+        "interval_f1_mean": 0.09737827715355805
+      }
+    },
+    "Sample_Game_2": {
+      "v8_boundary": {
+        "known_frames": 126815,
+        "dead_precision": 0.2185792349726776,
+        "dead_recall": 0.0008368025773519383,
+        "dead_frame_f1": 0.0016672224074691564,
+        "false_dead_s": 5.72,
+        "missed_dead_s": 1910.44,
+        "interval_f1_mean": 0.0
+      },
+      "v8_stationary": {
+        "known_frames": 126815,
+        "dead_precision": 0.07736943907156674,
+        "dead_recall": 0.0008368025773519383,
+        "dead_frame_f1": 0.0016556976696055301,
+        "false_dead_s": 19.08,
+        "missed_dead_s": 1910.44,
+        "interval_f1_mean": 0.0
+      },
+      "v8_restart": {
+        "known_frames": 126815,
+        "dead_precision": 0.6290064102564102,
+        "dead_recall": 0.03284450116106358,
+        "dead_frame_f1": 0.062429170725888224,
+        "false_dead_s": 37.04,
+        "missed_dead_s": 1849.24,
+        "interval_f1_mean": 0.0582010582010582
+      },
+      "v8_pressure": {
+        "known_frames": 126815,
+        "dead_precision": 0.681719496309162,
+        "dead_recall": 0.03284450116106358,
+        "dead_frame_f1": 0.06266964713396136,
+        "false_dead_s": 29.32,
+        "missed_dead_s": 1849.24,
+        "interval_f1_mean": 0.059139784946236555
+      }
+    },
+    "Sample_Game_3": {
+      "v8_boundary": {
+        "known_frames": 136616,
+        "dead_precision": 0.04424778761061947,
+        "dead_recall": 0.0003578329635726043,
+        "dead_frame_f1": 0.0007099247479767144,
+        "false_dead_s": 12.96,
+        "missed_dead_s": 1676.16,
+        "interval_f1_mean": 0.0
+      },
+      "v8_stationary": {
+        "known_frames": 136616,
+        "dead_precision": 0.023923444976076555,
+        "dead_recall": 0.0003578329635726043,
+        "dead_frame_f1": 0.0007051191651389084,
+        "false_dead_s": 24.48,
+        "missed_dead_s": 1676.16,
+        "interval_f1_mean": 0.0
+      },
+      "v8_restart": {
+        "known_frames": 136616,
+        "dead_precision": 0.24707996406109614,
+        "dead_recall": 0.006560270998831079,
+        "dead_frame_f1": 0.01278118609406953,
+        "false_dead_s": 33.52,
+        "missed_dead_s": 1665.76,
+        "interval_f1_mean": 0.037037037037037035
+      },
+      "v8_pressure": {
+        "known_frames": 136616,
+        "dead_precision": 0.26621490803484993,
+        "dead_recall": 0.006560270998831079,
+        "dead_frame_f1": 0.012804991618550941,
+        "false_dead_s": 30.32,
+        "missed_dead_s": 1665.76,
+        "interval_f1_mean": 0.037333333333333336
+      }
+    }
+  },
+  "takeaways": [
+    "Best observed public Spell F1 is unchanged at 0.411765. Boundary extension adds 9 true D frames and 1 false D frame; accuracy rises by 8/7500 frames.",
+    "Stationarity, longer stop memory, pressure guard and supported tags add no further public-window prediction changes in this fixed experiment.",
+    "Combining V3 dead periods with V7 control raises the V3 parent from 0.308333 to 0.379487, retaining 45.3% D recall and 96.1% D precision, but does not beat V7 transfer.",
+    "External fixed-rule recall is low. A pressure veto reduces false-D seconds across all three sample checks; it does not solve missing-ball stoppages.",
+    "Public observations guide the next audit, not post-score parameter changes. No new model was trained or automatically selected."
+  ],
+  "limitations": [
+    "Public scores reuse only five minutes and 17 possession spells; there is no independent full-match result.",
+    "All thresholds are fixed engineering choices, not calibrated probabilities or optimized parameters.",
+    "V8 adds no new training. External event-derived targets are approximate evaluation labels; uncertain boundaries are masked.",
+    "External checks evaluate fixed standalone dead-ball rules, not official H/A possession Spell F1. Automatic BAR-ATH tags are not used in external checks.",
+    "Stationary ball plus quiet players can still be live play. Five-second unsupported continuity can falsely extend a stop.",
+    "Restart movement can be a returned or repositioned ball. Two-dimensional tracking cannot guarantee the referee decision.",
+    "These methods are offline: confirmation can backdate entries, and V7 ownership can use future observations.",
+    "A pressure veto is only a movement clue; it does not identify fouls, cards, fights, injuries or offside.",
+    "No broadcast fusion, video model, permanent player identity, referee track or ball height was added."
+  ]
+}
