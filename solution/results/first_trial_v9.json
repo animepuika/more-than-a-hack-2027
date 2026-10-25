@@ -1,0 +1,1429 @@
+{
+  "experiment": "FirstTrial v9 - external Metrica bench and V7 control memory with a V2-motion gap fallback",
+  "run_created_utc": "2026-10-25T10:02:19.241938+00:00",
+  "scope": "Method selection on approximate event-derived labels for three external matches, with simulated live-ball gaps; BAR-ATH public five minutes as a sanity check only. No full-match or independent BAR-ATH validation claim.",
+  "design": "Existing methods run unchanged on 1,145 external possession spells at 0/10/25/40% of live frames with the ball hidden (BAR-ATH gap lengths, seed 0). V9 and its 2 s gap threshold were declared before scoring; 1 s and 5 s are sensitivity only. BAR-ATH V9 predictions were frozen before the public scorer ran.",
+  "config": {
+    "gap_fallback_s": 2.0,
+    "fallback_sequence": "v2_motion",
+    "base_dead_mask": "v2_shape_motion",
+    "control_settings": "solution/config_v7.json (unchanged)",
+    "short_spell_merge_s": 1.0,
+    "bootstrap_draws": 1000
+  },
+  "validation": {
+    "behavior_tests_passed": 99,
+    "rows_per_prediction": 199319,
+    "bar_ath_prediction_files": 7,
+    "official_format_valid_all_methods": true,
+    "v7_transfer_reproduced_exactly": true,
+    "baselines_identical_to_shipped": true,
+    "older_bench_predictions_byte_identical_after_v9_added": "144 of 144 files",
+    "existing_v1_v8_source_files_changed": false
+  },
+  "external_labels": {
+    "matches": [
+      "Sample_Game_1",
+      "Sample_Game_2",
+      "Sample_Game_3"
+    ],
+    "possession_spells": 1145,
+    "team_mapping_agreement_at_control_events": [
+      0.959,
+      0.953,
+      0.968
+    ],
+    "live_ball_missing_before_masking": [
+      0.052,
+      0.09,
+      0.027
+    ],
+    "dead_ball_missing": [
+      0.921,
+      0.998,
+      0.997
+    ]
+  },
+  "ball_masking_realised": {
+    "0": "no added masking",
+    "10": {
+      "Sample_Game_1": {
+        "live_missing_before": 0.05235548937322323,
+        "live_missing_after": 0.10035648210820812,
+        "graded_missing_after": 0.40883495692325017,
+        "gaps_added": 15
+      },
+      "Sample_Game_2": {
+        "live_missing_before": 0.08993533846103349,
+        "live_missing_after": 0.10217836081357565,
+        "graded_missing_after": 0.41368333904305127,
+        "gaps_added": 6
+      },
+      "Sample_Game_3": {
+        "live_missing_before": 0.02671347275145769,
+        "live_missing_after": 0.10140318241371378,
+        "graded_missing_after": 0.3695688736895218,
+        "gaps_added": 21
+      }
+    },
+    "25": {
+      "Sample_Game_1": {
+        "live_missing_before": 0.05235548937322323,
+        "live_missing_after": 0.25656558819547853,
+        "graded_missing_after": 0.5074328509488147,
+        "gaps_added": 53
+      },
+      "Sample_Game_2": {
+        "live_missing_before": 0.08993533846103349,
+        "live_missing_after": 0.2516767141872449,
+        "graded_missing_after": 0.511290967226219,
+        "gaps_added": 54
+      },
+      "Sample_Game_3": {
+        "live_missing_before": 0.02671347275145769,
+        "live_missing_after": 0.25278286177203035,
+        "graded_missing_after": 0.47584375175197624,
+        "gaps_added": 79
+      }
+    },
+    "40": {
+      "Sample_Game_1": {
+        "live_missing_before": 0.05235548937322323,
+        "live_missing_after": 0.4010085284960065,
+        "graded_missing_after": 0.5976195168646883,
+        "gaps_added": 110
+      },
+      "Sample_Game_2": {
+        "live_missing_before": 0.08993533846103349,
+        "live_missing_after": 0.4314160986444053,
+        "graded_missing_after": 0.6286470823341327,
+        "gaps_added": 113
+      },
+      "Sample_Game_3": {
+        "live_missing_before": 0.02671347275145769,
+        "live_missing_after": 0.40115214977947133,
+        "graded_missing_after": 0.579876100241072,
+        "gaps_added": 166
+      }
+    }
+  },
+  "external_bench_results": {
+    "0": {
+      "v9_gap_motion": {
+        "spell_f1": 0.463698,
+        "spell_bootstrap_90": [
+          0.438906,
+          0.488296
+        ],
+        "spell_f1_short_spells_merged_gt": 0.499375,
+        "macro_f1": 0.736215,
+        "predicted_spells": 921,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.461844,
+          "Sample_Game_2": 0.467818,
+          "Sample_Game_3": 0.461878
+        }
+      },
+      "v9_gap_motion_union": {
+        "spell_f1": 0.476442,
+        "spell_bootstrap_90": [
+          0.453167,
+          0.501662
+        ],
+        "spell_f1_short_spells_merged_gt": 0.512632,
+        "macro_f1": 0.841917,
+        "predicted_spells": 901,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.476672,
+          "Sample_Game_2": 0.498898,
+          "Sample_Game_3": 0.456911
+        }
+      },
+      "v9_gap_motion_union_gap1s": {
+        "spell_f1": 0.477388,
+        "spell_bootstrap_90": [
+          0.453596,
+          0.502349
+        ],
+        "spell_f1_short_spells_merged_gt": 0.513956,
+        "macro_f1": 0.842039,
+        "predicted_spells": 907,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.474074,
+          "Sample_Game_2": 0.501099,
+          "Sample_Game_3": 0.46
+        }
+      },
+      "v9_gap_motion_union_gap5s": {
+        "spell_f1": 0.474792,
+        "spell_bootstrap_90": [
+          0.45207,
+          0.499853
+        ],
+        "spell_f1_short_spells_merged_gt": 0.510912,
+        "macro_f1": 0.841482,
+        "predicted_spells": 898,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.474405,
+          "Sample_Game_2": 0.498898,
+          "Sample_Game_3": 0.454348
+        }
+      },
+      "v7_transfer_union_redecode": {
+        "spell_f1": 0.48048,
+        "spell_bootstrap_90": [
+          0.457057,
+          0.505906
+        ],
+        "spell_f1_short_spells_merged_gt": 0.517711,
+        "macro_f1": 0.842098,
+        "predicted_spells": 853,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.479394,
+          "Sample_Game_2": 0.501935,
+          "Sample_Game_3": 0.462953
+        }
+      },
+      "v7_transfer_v3d_overlay": {
+        "spell_f1": 0.478525,
+        "spell_bootstrap_90": [
+          0.454998,
+          0.503847
+        ],
+        "spell_f1_short_spells_merged_gt": 0.514777,
+        "macro_f1": 0.841736,
+        "predicted_spells": 862,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.477711,
+          "Sample_Game_2": 0.497106,
+          "Sample_Game_3": 0.463245
+        }
+      },
+      "v7_transfer": {
+        "spell_f1": 0.433829,
+        "spell_bootstrap_90": [
+          0.407986,
+          0.459047
+        ],
+        "spell_f1_short_spells_merged_gt": 0.469141,
+        "macro_f1": 0.732307,
+        "predicted_spells": 806,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.436578,
+          "Sample_Game_2": 0.418887,
+          "Sample_Game_3": 0.444118
+        }
+      },
+      "v2_motion": {
+        "spell_f1": 0.423094,
+        "spell_bootstrap_90": [
+          0.404441,
+          0.440274
+        ],
+        "spell_f1_short_spells_merged_gt": 0.434272,
+        "macro_f1": 0.727184,
+        "predicted_spells": 1557,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.417467,
+          "Sample_Game_2": 0.410602,
+          "Sample_Game_3": 0.439331
+        }
+      },
+      "v2_shape_motion": {
+        "spell_f1": 0.397541,
+        "spell_bootstrap_90": [
+          0.379602,
+          0.414329
+        ],
+        "spell_f1_short_spells_merged_gt": 0.406567,
+        "macro_f1": 0.733452,
+        "predicted_spells": 1620,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.402141,
+          "Sample_Game_2": 0.40143,
+          "Sample_Game_3": 0.389919
+        }
+      },
+      "v2_shape": {
+        "spell_f1": 0.39023,
+        "spell_bootstrap_90": [
+          0.372414,
+          0.40704
+        ],
+        "spell_f1_short_spells_merged_gt": 0.4,
+        "macro_f1": 0.731843,
+        "predicted_spells": 1639,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.404746,
+          "Sample_Game_2": 0.392462,
+          "Sample_Game_3": 0.375
+        }
+      },
+      "v1_gap_stop": {
+        "spell_f1": 0.430145,
+        "spell_bootstrap_90": [
+          0.411163,
+          0.44821
+        ],
+        "spell_f1_short_spells_merged_gt": 0.442301,
+        "macro_f1": 0.727442,
+        "predicted_spells": 1469,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.433784,
+          "Sample_Game_2": 0.4195,
+          "Sample_Game_3": 0.435853
+        }
+      },
+      "v3_soft": {
+        "spell_f1": 0.40883,
+        "spell_bootstrap_90": [
+          0.389993,
+          0.426049
+        ],
+        "spell_f1_short_spells_merged_gt": 0.418818,
+        "macro_f1": 0.841135,
+        "predicted_spells": 1573,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.429279,
+          "Sample_Game_2": 0.416706,
+          "Sample_Game_3": 0.383871
+        }
+      },
+      "baseline_raw": {
+        "spell_f1": 0.104888,
+        "spell_bootstrap_90": [
+          0.099533,
+          0.110097
+        ],
+        "spell_f1_short_spells_merged_gt": 0.095432,
+        "macro_f1": 0.8235,
+        "predicted_spells": 6772,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.124574,
+          "Sample_Game_2": 0.101577,
+          "Sample_Game_3": 0.091801
+        }
+      },
+      "baseline_smooth25": {
+        "spell_f1": 0.365671,
+        "spell_bootstrap_90": [
+          0.35045,
+          0.381012
+        ],
+        "spell_f1_short_spells_merged_gt": 0.374432,
+        "macro_f1": 0.833658,
+        "predicted_spells": 2036,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.391339,
+          "Sample_Game_2": 0.362256,
+          "Sample_Game_3": 0.346555
+        }
+      },
+      "baseline_smooth50": {
+        "spell_f1": 0.414826,
+        "spell_bootstrap_90": [
+          0.397118,
+          0.432988
+        ],
+        "spell_f1_short_spells_merged_gt": 0.435228,
+        "macro_f1": 0.819874,
+        "predicted_spells": 1499,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.43907,
+          "Sample_Game_2": 0.413625,
+          "Sample_Game_3": 0.394179
+        }
+      },
+      "baseline_smooth125": {
+        "spell_f1": 0.30194,
+        "spell_bootstrap_90": [
+          0.281481,
+          0.32224
+        ],
+        "spell_f1_short_spells_merged_gt": 0.326484,
+        "macro_f1": 0.741053,
+        "predicted_spells": 1123,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.297772,
+          "Sample_Game_2": 0.292011,
+          "Sample_Game_3": 0.315276
+        }
+      }
+    },
+    "10": {
+      "v9_gap_motion": {
+        "spell_f1": 0.454741,
+        "spell_bootstrap_90": [
+          0.430293,
+          0.479179
+        ],
+        "spell_f1_short_spells_merged_gt": 0.490105,
+        "macro_f1": 0.731631,
+        "predicted_spells": 901,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.458453,
+          "Sample_Game_2": 0.465934,
+          "Sample_Game_3": 0.441069
+        }
+      },
+      "v9_gap_motion_union": {
+        "spell_f1": 0.45614,
+        "spell_bootstrap_90": [
+          0.431579,
+          0.481481
+        ],
+        "spell_f1_short_spells_merged_gt": 0.489822,
+        "macro_f1": 0.830324,
+        "predicted_spells": 907,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.460624,
+          "Sample_Game_2": 0.497484,
+          "Sample_Game_3": 0.416689
+        }
+      },
+      "v9_gap_motion_union_gap1s": {
+        "spell_f1": 0.456921,
+        "spell_bootstrap_90": [
+          0.432627,
+          0.481991
+        ],
+        "spell_f1_short_spells_merged_gt": 0.490957,
+        "macro_f1": 0.830451,
+        "predicted_spells": 914,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.457396,
+          "Sample_Game_2": 0.499687,
+          "Sample_Game_3": 0.419866
+        }
+      },
+      "v9_gap_motion_union_gap5s": {
+        "spell_f1": 0.454661,
+        "spell_bootstrap_90": [
+          0.430835,
+          0.480273
+        ],
+        "spell_f1_short_spells_merged_gt": 0.488282,
+        "macro_f1": 0.829893,
+        "predicted_spells": 904,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.458333,
+          "Sample_Game_2": 0.498113,
+          "Sample_Game_3": 0.414035
+        }
+      },
+      "v7_transfer_union_redecode": {
+        "spell_f1": 0.4578,
+        "spell_bootstrap_90": [
+          0.43359,
+          0.4834
+        ],
+        "spell_f1_short_spells_merged_gt": 0.491262,
+        "macro_f1": 0.830494,
+        "predicted_spells": 855,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.46354,
+          "Sample_Game_2": 0.497419,
+          "Sample_Game_3": 0.418359
+        }
+      },
+      "v7_transfer_v3d_overlay": {
+        "spell_f1": 0.4558,
+        "spell_bootstrap_90": [
+          0.43139,
+          0.48061
+        ],
+        "spell_f1_short_spells_merged_gt": 0.489105,
+        "macro_f1": 0.826519,
+        "predicted_spells": 855,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.460843,
+          "Sample_Game_2": 0.491172,
+          "Sample_Game_3": 0.420196
+        }
+      },
+      "v7_transfer": {
+        "spell_f1": 0.413937,
+        "spell_bootstrap_90": [
+          0.389173,
+          0.439106
+        ],
+        "spell_f1_short_spells_merged_gt": 0.449297,
+        "macro_f1": 0.722802,
+        "predicted_spells": 778,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.429895,
+          "Sample_Game_2": 0.414165,
+          "Sample_Game_3": 0.397579
+        }
+      },
+      "v2_motion": {
+        "spell_f1": 0.411614,
+        "spell_bootstrap_90": [
+          0.393062,
+          0.430015
+        ],
+        "spell_f1_short_spells_merged_gt": 0.42937,
+        "macro_f1": 0.72241,
+        "predicted_spells": 1507,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.414175,
+          "Sample_Game_2": 0.410628,
+          "Sample_Game_3": 0.409989
+        }
+      },
+      "v2_shape_motion": {
+        "spell_f1": 0.38947,
+        "spell_bootstrap_90": [
+          0.372066,
+          0.406289
+        ],
+        "spell_f1_short_spells_merged_gt": 0.400927,
+        "macro_f1": 0.731306,
+        "predicted_spells": 1590,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.401292,
+          "Sample_Game_2": 0.397625,
+          "Sample_Game_3": 0.370954
+        }
+      },
+      "v2_shape": {
+        "spell_f1": 0.386121,
+        "spell_bootstrap_90": [
+          0.367999,
+          0.403652
+        ],
+        "spell_f1_short_spells_merged_gt": 0.398611,
+        "macro_f1": 0.729446,
+        "predicted_spells": 1593,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.40393,
+          "Sample_Game_2": 0.393381,
+          "Sample_Game_3": 0.363115
+        }
+      },
+      "v1_gap_stop": {
+        "spell_f1": 0.420389,
+        "spell_bootstrap_90": [
+          0.400926,
+          0.439541
+        ],
+        "spell_f1_short_spells_merged_gt": 0.437624,
+        "macro_f1": 0.720857,
+        "predicted_spells": 1425,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.433295,
+          "Sample_Game_2": 0.417522,
+          "Sample_Game_3": 0.410291
+        }
+      },
+      "v3_soft": {
+        "spell_f1": 0.396001,
+        "spell_bootstrap_90": [
+          0.377786,
+          0.41318
+        ],
+        "spell_f1_short_spells_merged_gt": 0.406262,
+        "macro_f1": 0.831174,
+        "predicted_spells": 1556,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.418038,
+          "Sample_Game_2": 0.411429,
+          "Sample_Game_3": 0.362628
+        }
+      },
+      "baseline_raw": {
+        "spell_f1": 0.102936,
+        "spell_bootstrap_90": [
+          0.097557,
+          0.10842
+        ],
+        "spell_f1_short_spells_merged_gt": 0.094985,
+        "macro_f1": 0.797336,
+        "predicted_spells": 6518,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.124829,
+          "Sample_Game_2": 0.100991,
+          "Sample_Game_3": 0.086448
+        }
+      },
+      "baseline_smooth25": {
+        "spell_f1": 0.353076,
+        "spell_bootstrap_90": [
+          0.337902,
+          0.368256
+        ],
+        "spell_f1_short_spells_merged_gt": 0.364694,
+        "macro_f1": 0.810364,
+        "predicted_spells": 1992,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.382522,
+          "Sample_Game_2": 0.357464,
+          "Sample_Game_3": 0.323611
+        }
+      },
+      "baseline_smooth50": {
+        "spell_f1": 0.400455,
+        "spell_bootstrap_90": [
+          0.383017,
+          0.419257
+        ],
+        "spell_f1_short_spells_merged_gt": 0.420064,
+        "macro_f1": 0.800526,
+        "predicted_spells": 1493,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.423638,
+          "Sample_Game_2": 0.407739,
+          "Sample_Game_3": 0.372996
+        }
+      },
+      "baseline_smooth125": {
+        "spell_f1": 0.291463,
+        "spell_bootstrap_90": [
+          0.271943,
+          0.31115
+        ],
+        "spell_f1_short_spells_merged_gt": 0.314605,
+        "macro_f1": 0.729612,
+        "predicted_spells": 1151,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.286979,
+          "Sample_Game_2": 0.28664,
+          "Sample_Game_3": 0.300381
+        }
+      }
+    },
+    "25": {
+      "v9_gap_motion": {
+        "spell_f1": 0.409693,
+        "spell_bootstrap_90": [
+          0.385955,
+          0.433867
+        ],
+        "spell_f1_short_spells_merged_gt": 0.44307,
+        "macro_f1": 0.712584,
+        "predicted_spells": 877,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.409117,
+          "Sample_Game_2": 0.429936,
+          "Sample_Game_3": 0.391908
+        }
+      },
+      "v9_gap_motion_union": {
+        "spell_f1": 0.405039,
+        "spell_bootstrap_90": [
+          0.381773,
+          0.428682
+        ],
+        "spell_f1_short_spells_merged_gt": 0.434202,
+        "macro_f1": 0.78733,
+        "predicted_spells": 919,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.40295,
+          "Sample_Game_2": 0.449922,
+          "Sample_Game_3": 0.368322
+        }
+      },
+      "v9_gap_motion_union_gap1s": {
+        "spell_f1": 0.405411,
+        "spell_bootstrap_90": [
+          0.382415,
+          0.429188
+        ],
+        "spell_f1_short_spells_merged_gt": 0.435135,
+        "macro_f1": 0.787345,
+        "predicted_spells": 925,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.400588,
+          "Sample_Game_2": 0.450389,
+          "Sample_Game_3": 0.371084
+        }
+      },
+      "v9_gap_motion_union_gap5s": {
+        "spell_f1": 0.40544,
+        "spell_bootstrap_90": [
+          0.382895,
+          0.429539
+        ],
+        "spell_f1_short_spells_merged_gt": 0.43471,
+        "macro_f1": 0.787343,
+        "predicted_spells": 914,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.400591,
+          "Sample_Game_2": 0.453834,
+          "Sample_Game_3": 0.368237
+        }
+      },
+      "v7_transfer_union_redecode": {
+        "spell_f1": 0.405433,
+        "spell_bootstrap_90": [
+          0.38169,
+          0.429577
+        ],
+        "spell_f1_short_spells_merged_gt": 0.434528,
+        "macro_f1": 0.790629,
+        "predicted_spells": 843,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.417204,
+          "Sample_Game_2": 0.448154,
+          "Sample_Game_3": 0.357423
+        }
+      },
+      "v7_transfer_v3d_overlay": {
+        "spell_f1": 0.404836,
+        "spell_bootstrap_90": [
+          0.381058,
+          0.429229
+        ],
+        "spell_f1_short_spells_merged_gt": 0.433931,
+        "macro_f1": 0.785765,
+        "predicted_spells": 840,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.416692,
+          "Sample_Game_2": 0.441401,
+          "Sample_Game_3": 0.36169
+        }
+      },
+      "v7_transfer": {
+        "spell_f1": 0.36555,
+        "spell_bootstrap_90": [
+          0.340234,
+          0.389803
+        ],
+        "spell_f1_short_spells_merged_gt": 0.398386,
+        "macro_f1": 0.706617,
+        "predicted_spells": 736,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.385868,
+          "Sample_Game_2": 0.372881,
+          "Sample_Game_3": 0.338125
+        }
+      },
+      "v2_motion": {
+        "spell_f1": 0.383513,
+        "spell_bootstrap_90": [
+          0.364626,
+          0.402569
+        ],
+        "spell_f1_short_spells_merged_gt": 0.4017,
+        "macro_f1": 0.706643,
+        "predicted_spells": 1354,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.379724,
+          "Sample_Game_2": 0.395839,
+          "Sample_Game_3": 0.376334
+        }
+      },
+      "v2_shape_motion": {
+        "spell_f1": 0.359954,
+        "spell_bootstrap_90": [
+          0.342309,
+          0.378826
+        ],
+        "spell_f1_short_spells_merged_gt": 0.374319,
+        "macro_f1": 0.717972,
+        "predicted_spells": 1462,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.367963,
+          "Sample_Game_2": 0.363017,
+          "Sample_Game_3": 0.349506
+        }
+      },
+      "v2_shape": {
+        "spell_f1": 0.35267,
+        "spell_bootstrap_90": [
+          0.335152,
+          0.37204
+        ],
+        "spell_f1_short_spells_merged_gt": 0.367277,
+        "macro_f1": 0.715902,
+        "predicted_spells": 1458,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.370766,
+          "Sample_Game_2": 0.357509,
+          "Sample_Game_3": 0.331453
+        }
+      },
+      "v1_gap_stop": {
+        "spell_f1": 0.378387,
+        "spell_bootstrap_90": [
+          0.358603,
+          0.39867
+        ],
+        "spell_f1_short_spells_merged_gt": 0.396814,
+        "macro_f1": 0.701781,
+        "predicted_spells": 1261,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.395116,
+          "Sample_Game_2": 0.379392,
+          "Sample_Game_3": 0.360964
+        }
+      },
+      "v3_soft": {
+        "spell_f1": 0.360169,
+        "spell_bootstrap_90": [
+          0.342484,
+          0.378485
+        ],
+        "spell_f1_short_spells_merged_gt": 0.372627,
+        "macro_f1": 0.793473,
+        "predicted_spells": 1456,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.376555,
+          "Sample_Game_2": 0.372263,
+          "Sample_Game_3": 0.335101
+        }
+      },
+      "baseline_raw": {
+        "spell_f1": 0.094062,
+        "spell_bootstrap_90": [
+          0.088449,
+          0.09997
+        ],
+        "spell_f1_short_spells_merged_gt": 0.088527,
+        "macro_f1": 0.71287,
+        "predicted_spells": 5625,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.115639,
+          "Sample_Game_2": 0.091652,
+          "Sample_Game_3": 0.078683
+        }
+      },
+      "baseline_smooth25": {
+        "spell_f1": 0.30864,
+        "spell_bootstrap_90": [
+          0.293101,
+          0.324059
+        ],
+        "spell_f1_short_spells_merged_gt": 0.320563,
+        "macro_f1": 0.73398,
+        "predicted_spells": 1841,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.341075,
+          "Sample_Game_2": 0.316387,
+          "Sample_Game_3": 0.274638
+        }
+      },
+      "baseline_smooth50": {
+        "spell_f1": 0.347381,
+        "spell_bootstrap_90": [
+          0.329988,
+          0.365541
+        ],
+        "spell_f1_short_spells_merged_gt": 0.365117,
+        "macro_f1": 0.734271,
+        "predicted_spells": 1432,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.373366,
+          "Sample_Game_2": 0.358454,
+          "Sample_Game_3": 0.315139
+        }
+      },
+      "baseline_smooth125": {
+        "spell_f1": 0.269345,
+        "spell_bootstrap_90": [
+          0.249773,
+          0.288742
+        ],
+        "spell_f1_short_spells_merged_gt": 0.289552,
+        "macro_f1": 0.689611,
+        "predicted_spells": 1145,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.273628,
+          "Sample_Game_2": 0.260267,
+          "Sample_Game_3": 0.273897
+        }
+      }
+    },
+    "40": {
+      "v9_gap_motion": {
+        "spell_f1": 0.38147,
+        "spell_bootstrap_90": [
+          0.357895,
+          0.406647
+        ],
+        "spell_f1_short_spells_merged_gt": 0.412609,
+        "macro_f1": 0.694575,
+        "predicted_spells": 841,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.387647,
+          "Sample_Game_2": 0.384466,
+          "Sample_Game_3": 0.372674
+        }
+      },
+      "v9_gap_motion_union": {
+        "spell_f1": 0.359577,
+        "spell_bootstrap_90": [
+          0.337623,
+          0.382483
+        ],
+        "spell_f1_short_spells_merged_gt": 0.384265,
+        "macro_f1": 0.747338,
+        "predicted_spells": 933,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.359463,
+          "Sample_Game_2": 0.383486,
+          "Sample_Game_3": 0.338911
+        }
+      },
+      "v9_gap_motion_union_gap1s": {
+        "spell_f1": 0.360058,
+        "spell_bootstrap_90": [
+          0.338358,
+          0.382343
+        ],
+        "spell_f1_short_spells_merged_gt": 0.384925,
+        "macro_f1": 0.747378,
+        "predicted_spells": 938,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.357864,
+          "Sample_Game_2": 0.383486,
+          "Sample_Game_3": 0.341722
+        }
+      },
+      "v9_gap_motion_union_gap5s": {
+        "spell_f1": 0.359306,
+        "spell_bootstrap_90": [
+          0.336924,
+          0.382073
+        ],
+        "spell_f1_short_spells_merged_gt": 0.384025,
+        "macro_f1": 0.747238,
+        "predicted_spells": 929,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.357015,
+          "Sample_Game_2": 0.385299,
+          "Sample_Game_3": 0.338748
+        }
+      },
+      "v7_transfer_union_redecode": {
+        "spell_f1": 0.353838,
+        "spell_bootstrap_90": [
+          0.331952,
+          0.376327
+        ],
+        "spell_f1_short_spells_merged_gt": 0.377694,
+        "macro_f1": 0.753893,
+        "predicted_spells": 848,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.375776,
+          "Sample_Game_2": 0.369716,
+          "Sample_Game_3": 0.32
+        }
+      },
+      "v7_transfer_v3d_overlay": {
+        "spell_f1": 0.347162,
+        "spell_bootstrap_90": [
+          0.324651,
+          0.369694
+        ],
+        "spell_f1_short_spells_merged_gt": 0.371382,
+        "macro_f1": 0.738473,
+        "predicted_spells": 846,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.364431,
+          "Sample_Game_2": 0.360625,
+          "Sample_Game_3": 0.319437
+        }
+      },
+      "v7_transfer": {
+        "spell_f1": 0.319481,
+        "spell_bootstrap_90": [
+          0.294805,
+          0.342446
+        ],
+        "spell_f1_short_spells_merged_gt": 0.346886,
+        "macro_f1": 0.683847,
+        "predicted_spells": 703,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.345283,
+          "Sample_Game_2": 0.317949,
+          "Sample_Game_3": 0.294737
+        }
+      },
+      "v2_motion": {
+        "spell_f1": 0.359129,
+        "spell_bootstrap_90": [
+          0.340034,
+          0.380235
+        ],
+        "spell_f1_short_spells_merged_gt": 0.378591,
+        "macro_f1": 0.690226,
+        "predicted_spells": 1243,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.344298,
+          "Sample_Game_2": 0.368349,
+          "Sample_Game_3": 0.365937
+        }
+      },
+      "v2_shape_motion": {
+        "spell_f1": 0.345133,
+        "spell_bootstrap_90": [
+          0.325977,
+          0.364602
+        ],
+        "spell_f1_short_spells_merged_gt": 0.360855,
+        "macro_f1": 0.706945,
+        "predicted_spells": 1341,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.347268,
+          "Sample_Game_2": 0.344402,
+          "Sample_Game_3": 0.343714
+        }
+      },
+      "v2_shape": {
+        "spell_f1": 0.338708,
+        "spell_bootstrap_90": [
+          0.318813,
+          0.357345
+        ],
+        "spell_f1_short_spells_merged_gt": 0.354495,
+        "macro_f1": 0.705407,
+        "predicted_spells": 1348,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.34851,
+          "Sample_Game_2": 0.342199,
+          "Sample_Game_3": 0.326147
+        }
+      },
+      "v1_gap_stop": {
+        "spell_f1": 0.342407,
+        "spell_bootstrap_90": [
+          0.322101,
+          0.363597
+        ],
+        "spell_f1_short_spells_merged_gt": 0.360542,
+        "macro_f1": 0.679996,
+        "predicted_spells": 1140,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.349682,
+          "Sample_Game_2": 0.335664,
+          "Sample_Game_3": 0.341252
+        }
+      },
+      "v3_soft": {
+        "spell_f1": 0.333227,
+        "spell_bootstrap_90": [
+          0.31553,
+          0.350143
+        ],
+        "spell_f1_short_spells_merged_gt": 0.346193,
+        "macro_f1": 0.759904,
+        "predicted_spells": 1365,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.343494,
+          "Sample_Game_2": 0.342857,
+          "Sample_Game_3": 0.315789
+        }
+      },
+      "baseline_raw": {
+        "spell_f1": 0.09171,
+        "spell_bootstrap_90": [
+          0.085467,
+          0.098581
+        ],
+        "spell_f1_short_spells_merged_gt": 0.086406,
+        "macro_f1": 0.623309,
+        "predicted_spells": 4621,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.105618,
+          "Sample_Game_2": 0.094105,
+          "Sample_Game_3": 0.07818
+        }
+      },
+      "baseline_smooth25": {
+        "spell_f1": 0.268466,
+        "spell_bootstrap_90": [
+          0.253977,
+          0.283956
+        ],
+        "spell_f1_short_spells_merged_gt": 0.28,
+        "macro_f1": 0.649764,
+        "predicted_spells": 1671,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.290508,
+          "Sample_Game_2": 0.27935,
+          "Sample_Game_3": 0.240458
+        }
+      },
+      "baseline_smooth50": {
+        "spell_f1": 0.297152,
+        "spell_bootstrap_90": [
+          0.281171,
+          0.313774
+        ],
+        "spell_f1_short_spells_merged_gt": 0.312846,
+        "macro_f1": 0.65849,
+        "predicted_spells": 1383,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.315995,
+          "Sample_Game_2": 0.308171,
+          "Sample_Game_3": 0.271642
+        }
+      },
+      "baseline_smooth125": {
+        "spell_f1": 0.237181,
+        "spell_bootstrap_90": [
+          0.219383,
+          0.254282
+        ],
+        "spell_f1_short_spells_merged_gt": 0.255556,
+        "macro_f1": 0.637199,
+        "predicted_spells": 1125,
+        "per_match_spell_f1": {
+          "Sample_Game_1": 0.23079,
+          "Sample_Game_2": 0.233426,
+          "Sample_Game_3": 0.24646
+        }
+      }
+    }
+  },
+  "external_paired_differences": {
+    "0": {
+      "v9_gap_motion - v7_transfer": {
+        "mean": 0.030172,
+        "interval_90": [
+          0.019547,
+          0.041229
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v9_gap_motion - v7_transfer_union_redecode": {
+        "mean": -0.016636,
+        "interval_90": [
+          -0.03017,
+          -0.002306
+        ],
+        "share_of_draws_first_better": 0.029
+      },
+      "v9_gap_motion - v2_motion": {
+        "mean": 0.040992,
+        "interval_90": [
+          0.023144,
+          0.059374
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v9_gap_motion - baseline_smooth50": {
+        "mean": 0.048967,
+        "interval_90": [
+          0.030681,
+          0.067248
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v7_transfer_union_redecode - v7_transfer_v3d_overlay": {
+        "mean": 0.001923,
+        "interval_90": [
+          -0.001624,
+          0.005521
+        ],
+        "share_of_draws_first_better": 0.815
+      },
+      "v7_transfer - v1_gap_stop": {
+        "mean": 0.003722,
+        "interval_90": [
+          -0.016521,
+          0.022673
+        ],
+        "share_of_draws_first_better": 0.643
+      },
+      "baseline_smooth50 - baseline_smooth125": {
+        "mean": 0.113165,
+        "interval_90": [
+          0.098312,
+          0.128335
+        ],
+        "share_of_draws_first_better": 1.0
+      }
+    },
+    "10": {
+      "v9_gap_motion - v7_transfer": {
+        "mean": 0.041361,
+        "interval_90": [
+          0.028894,
+          0.054564
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v9_gap_motion - v7_transfer_union_redecode": {
+        "mean": -0.002751,
+        "interval_90": [
+          -0.017354,
+          0.012858
+        ],
+        "share_of_draws_first_better": 0.38
+      },
+      "v9_gap_motion - v2_motion": {
+        "mean": 0.043331,
+        "interval_90": [
+          0.025463,
+          0.061833
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v9_gap_motion - baseline_smooth50": {
+        "mean": 0.054517,
+        "interval_90": [
+          0.036393,
+          0.073217
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v7_transfer_union_redecode - v7_transfer_v3d_overlay": {
+        "mean": 0.001952,
+        "interval_90": [
+          -0.0016,
+          0.0058
+        ],
+        "share_of_draws_first_better": 0.788
+      },
+      "v7_transfer - v1_gap_stop": {
+        "mean": -0.006702,
+        "interval_90": [
+          -0.026433,
+          0.012535
+        ],
+        "share_of_draws_first_better": 0.285
+      },
+      "baseline_smooth50 - baseline_smooth125": {
+        "mean": 0.109185,
+        "interval_90": [
+          0.094525,
+          0.124101
+        ],
+        "share_of_draws_first_better": 1.0
+      }
+    },
+    "25": {
+      "v9_gap_motion - v7_transfer": {
+        "mean": 0.044821,
+        "interval_90": [
+          0.031359,
+          0.058173
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v9_gap_motion - v7_transfer_union_redecode": {
+        "mean": 0.004665,
+        "interval_90": [
+          -0.011998,
+          0.022385
+        ],
+        "share_of_draws_first_better": 0.669
+      },
+      "v9_gap_motion - v2_motion": {
+        "mean": 0.026136,
+        "interval_90": [
+          0.008398,
+          0.043192
+        ],
+        "share_of_draws_first_better": 0.993
+      },
+      "v9_gap_motion - baseline_smooth50": {
+        "mean": 0.062368,
+        "interval_90": [
+          0.044682,
+          0.082534
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v7_transfer_union_redecode - v7_transfer_v3d_overlay": {
+        "mean": 0.000557,
+        "interval_90": [
+          -0.003452,
+          0.004632
+        ],
+        "share_of_draws_first_better": 0.576
+      },
+      "v7_transfer - v1_gap_stop": {
+        "mean": -0.01341,
+        "interval_90": [
+          -0.032207,
+          0.004821
+        ],
+        "share_of_draws_first_better": 0.111
+      },
+      "baseline_smooth50 - baseline_smooth125": {
+        "mean": 0.078293,
+        "interval_90": [
+          0.064352,
+          0.092814
+        ],
+        "share_of_draws_first_better": 1.0
+      }
+    },
+    "40": {
+      "v9_gap_motion - v7_transfer": {
+        "mean": 0.062442,
+        "interval_90": [
+          0.048131,
+          0.07838
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v9_gap_motion - v7_transfer_union_redecode": {
+        "mean": 0.027966,
+        "interval_90": [
+          0.009723,
+          0.04673
+        ],
+        "share_of_draws_first_better": 0.994
+      },
+      "v9_gap_motion - v2_motion": {
+        "mean": 0.022214,
+        "interval_90": [
+          0.006665,
+          0.039002
+        ],
+        "share_of_draws_first_better": 0.986
+      },
+      "v9_gap_motion - baseline_smooth50": {
+        "mean": 0.084451,
+        "interval_90": [
+          0.065251,
+          0.10407
+        ],
+        "share_of_draws_first_better": 1.0
+      },
+      "v7_transfer_union_redecode - v7_transfer_v3d_overlay": {
+        "mean": 0.006791,
+        "interval_90": [
+          0.001453,
+          0.012507
+        ],
+        "share_of_draws_first_better": 0.981
+      },
+      "v7_transfer - v1_gap_stop": {
+        "mean": -0.023294,
+        "interval_90": [
+          -0.042417,
+          -0.005597
+        ],
+        "share_of_draws_first_better": 0.017
+      },
+      "baseline_smooth50 - baseline_smooth125": {
+        "mean": 0.060318,
+        "interval_90": [
+          0.04748,
+          0.073497
+        ],
+        "share_of_draws_first_better": 1.0
+      }
+    }
+  },
+  "bar_ath_public_results": [
+    {
+      "method": "baseline_smooth125",
+      "spell_f1": 0.424242,
+      "macro_f1": 0.581185,
+      "frame_accuracy": 0.727467,
+      "predicted_possessions": 16,
+      "spell_bootstrap_90": [
+        0.266667,
+        0.593939
+      ]
+    },
+    {
+      "method": "v7_transfer",
+      "spell_f1": 0.411765,
+      "macro_f1": 0.56026,
+      "frame_accuracy": 0.708,
+      "predicted_possessions": 17,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ]
+    },
+    {
+      "method": "v9_gap_motion",
+      "spell_f1": 0.4,
+      "macro_f1": 0.542674,
+      "frame_accuracy": 0.6868,
+      "predicted_possessions": 19,
+      "spell_bootstrap_90": [
+        0.266667,
+        0.533333
+      ]
+    },
+    {
+      "method": "v2_motion",
+      "spell_f1": 0.328889,
+      "macro_f1": 0.547533,
+      "frame_accuracy": 0.6928,
+      "predicted_possessions": 28,
+      "spell_bootstrap_90": [
+        0.213333,
+        0.435556
+      ]
+    },
+    {
+      "method": "baseline_smooth50",
+      "spell_f1": 0.325581,
+      "macro_f1": 0.620733,
+      "frame_accuracy": 0.7132,
+      "predicted_possessions": 26,
+      "spell_bootstrap_90": [
+        0.213953,
+        0.446512
+      ]
+    },
+    {
+      "method": "baseline_smooth25",
+      "spell_f1": 0.286792,
+      "macro_f1": 0.619991,
+      "frame_accuracy": 0.6912,
+      "predicted_possessions": 36,
+      "spell_bootstrap_90": [
+        0.196226,
+        0.384906
+      ]
+    },
+    {
+      "method": "baseline_raw",
+      "spell_f1": 0.037838,
+      "macro_f1": 0.597227,
+      "frame_accuracy": 0.6512,
+      "predicted_possessions": 131,
+      "spell_bootstrap_90": [
+        0.018919,
+        0.059459
+      ]
+    }
+  ],
+  "bar_ath_change_vs_v7": {
+    "full_match": {
+      "frames": 158857,
+      "changed_frames": 13979,
+      "changed_in_long_gaps": 11877,
+      "long_gap_frames": 64583,
+      "long_gap_s": 2583.32,
+      "v9_spells": 402,
+      "v7_spells": 374
+    },
+    "public_window": {
+      "frames": 7500,
+      "changed_frames": 413,
+      "changed_in_long_gaps": 232,
+      "long_gap_frames": 878,
+      "long_gap_s": 35.12,
+      "v9_spells": 19,
+      "v7_spells": 17
+    }
+  },
+  "takeaways": [
+    "V9 beats V7 transfer on the external bench at every hiding level (+0.030, +0.041, +0.045, +0.062; all paired draws).",
+    "V9 has the best average external Spell F1 and is best at 25% and 40% hidden; V7 + V3 dead ball (arm B) is best with a mostly visible ball.",
+    "On BAR-ATH public, V9 scores 0.400 vs V7 0.411765 and smooth125 0.424242: within noise; V9 predicts two extra spells.",
+    "V9 changes 8.8% of full-match graded frames, mostly in long ball gaps; the public window holds about 1.4% of long-gap time.",
+    "Recalculating ownership at added stoppages costs nothing externally (arm B vs arm A), answering the handover question.",
+    "smooth50 beats smooth125 externally, matching the official full-match order rather than the public one."
+  ],
+  "limitations": [
+    "External labels come from Metrica events, not corrected tracking; 12% of spells are under 1 s.",
+    "Metrica ball is missing in 92-100% of dead frames, while BAR-ATH public dead frames show the ball about 66% of the time; dead-ball detection is too easy externally.",
+    "Live-ball gaps are simulated with one random draw per level; the true BAR-ATH live-play missing share is unknown.",
+    "Three external matches from one provider; V8 and tag-based methods were not run (no Smart Tagging); V7 joint/learned-D variants were skipped to avoid training leakage.",
+    "BAR-ATH public scores reuse 17 inspected spells; no full-match winner is established.",
+    "V9, like V7, is offline and confirms transfers with future observations; the fallback inherits V2 motion errors."
+  ]
+}

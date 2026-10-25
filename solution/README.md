@@ -1,6 +1,6 @@
 # FirstTrial: repeatable possession experiments
 
-This folder keeps our experiments together, from the first nearest-player baseline through team shape, stoppage clues, physics, HMM smoothing, abstention, and external-sample training. The highest observed Spell F1 on the public five minutes remains **0.4118**, reached by V7 confirmed control and tied by V8's ball-based variants. V8 adds nine correct dead-ball frames and one false dead-ball frame, raising frame accuracy from 70.80% to 70.91%, but does not improve Spell F1. The reused sample has only 17 possession spells; it cannot establish a full-match winner. See the V7/V8 sections below for comparisons and limitations. Earlier sections record the experiments as they stood at the time.
+This folder keeps our experiments together, from the first nearest-player baseline through team shape, stoppage clues, physics, HMM smoothing, abstention, and external-sample training. The highest observed **custom-method** Spell F1 on the public five minutes remains **0.4118**, reached by V7 confirmed control and tied by V8's ball-based variants. The supplied **smooth125 baseline scores 0.4242 on this same public sample**, although the official full-match results favor smooth50 over smooth125. V8 adds nine correct dead-ball frames and one false dead-ball frame, raising frame accuracy from 70.80% to 70.91%, but does not improve Spell F1. The reused sample has only 17 possession spells; it cannot establish a full-match winner. V9 therefore selects methods on a larger external bench (1,145 possession spells from three Metrica matches, with the ball hidden during live play to resemble BAR-ATH); see the V9 section. See the V7/V8 sections below for comparisons and limitations. Earlier sections record the experiments as they stood at the time.
 
 ## Run it
 
@@ -414,3 +414,54 @@ Standalone rules were also checked against approximate event targets on all thre
 The next hypothesis is a richer distinction between **live play, ball retrieval/repositioning, restart preparation and the actual restart**. First validate those patterns on permitted external examples, including visible-ball stoppages. Do not simply loosen the threshold until these four inspected public pauses fit.
 
 **Verified:** 84 tests passed; all nine methods have valid 199,319-row files; the three reference files are byte-identical to V7; the lightweight features reproduce V7 ownership exactly. Source/prediction hashes were frozen before scoring. Aggregate results are in `results/first_trial_v8.json`. Local outputs are under `data/runs/eighth_trial/`, including `comparison.html`, `external_rule_checks.json`, `deadball_review.json` and `stop_criteria_review.json`.
+
+## Ninth experiment: a bigger test set, and following motion through ball gaps
+
+Seventeen public possessions cannot pick a method, and they contain almost none of the long ball gaps that make up 41% of the graded match. V9 builds a larger test set instead, then makes one targeted change.
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m solution.run_external --out data/runs/external_bench
+.\.venv\Scripts\python.exe -m solution.run_external --hide-live-ball 0.40 --out data/runs/external_bench_live40
+.\.venv\Scripts\python.exe -m solution.run_v9 --out data/runs/ninth_trial
+```
+
+`run_external` needs the Metrica sample checkout and, with `--hide-live-ball`, the V7 reference diagnostics for BAR-ATH gap lengths. `run_v9` needs the completed V7 reference run and checks its hashes.
+
+### The external bench
+
+- `external_possession.py` turns the Metrica event logs into H/A/D labels: dead from a stop marker to the next ball action, otherwise the team of the latest controlling event (pass, carry, recovery, set piece, shot, ball lost). Challenges, fouls and ball-outs never change the owner. This gives 1,145 possession spells; the team mapping agrees with nearest-player tracking about 96% of the time at controlling events.
+- `run_external.py` runs the existing methods unchanged on the three matches and scores them with the official metric, per match and pooled.
+- `ball_masking.py` hides the ball in random live stretches, with gap lengths drawn from BAR-ATH's 150 full-match ball gaps (median 10.7 s), until 10%, 25% or 40% of live frames are missing. BAR-ATH's true live-play share is unknown.
+
+A sanity check: smooth50 beats smooth125 on the bench by 0.11, as on the official full match and unlike the public five minutes.
+
+### V9: do not hold the old owner through a long gap
+
+V7 keeps the last confirmed owner while the ball is missing. On the bench that becomes its main weakness: with 40% of the live ball hidden it falls below V1 and predicts 703 spells against 1,145. `gap_fallback.py` keeps V7 everywhere else, but inside a ball gap of at least 2 s (declared before scoring) it follows V2 motion's team, and that team owns the ball when it returns.
+
+| Method (bench Spell F1) | 0% hidden | 10% | 25% | 40% |
+|---|---:|---:|---:|---:|
+| **V9 gap-motion** | 0.464 | 0.455 | **0.410** | **0.381** |
+| V7 + V3 dead ball, ownership recalculated | **0.481** | **0.458** | 0.405 | 0.354 |
+| V2 motion | 0.423 | 0.412 | 0.384 | 0.359 |
+| V7 confirmed control | 0.434 | 0.414 | 0.366 | 0.320 |
+| Official smooth50 | 0.415 | 0.401 | 0.347 | 0.297 |
+
+V9 beats V7 at every level (+0.030 to +0.062, in all 1,000 paired resamples). The 1 s and 5 s thresholds give nearly the same scores. Recalculating ownership at added stoppages costs nothing, which answers the handover's first question; the V3 dead-ball gain itself is likely inflated here, because Metrica's ball disappears during almost every stoppage.
+
+### On BAR-ATH
+
+| Method | Public Spell F1 | Predicted spells |
+|---|---:|---:|
+| Official smooth125 | 0.4242 | 16 |
+| V7 confirmed control | 0.4118 | 17 |
+| **V9 gap-motion** | 0.4000 | 19 |
+| V2 motion | 0.3289 | 28 |
+| Official smooth50 | 0.3256 | 26 |
+
+V9 and V7 match the same 11 true spells at IoU 0.3; V9 predicts two extra. That gap is noise. V9 changes 13,979 full-match graded frames (8.8%), 11,877 of them inside long ball gaps, but the public window holds only 35 s of the match's 2,583 s of long gaps. The public sample therefore barely tests V9.
+
+**Verified:** 99 tests pass; V7 is reproduced exactly from light features; all seven BAR-ATH files are valid; the shipped baselines are byte-identical; adding V9 left all 144 earlier bench predictions byte-identical; no V1–V8 source file changed. Aggregate results are in `results/first_trial_v9.json`. Local outputs are under `data/runs/external_bench*/` and `data/runs/ninth_trial/`.
+
+**Limitations:** the external labels are event-derived approximations; gaps are simulated with one random draw per level; dead ball is too easy on Metrica; V8 and tag-based methods could not run there (no Smart Tagging). V9 is offline like V7 and inherits V2 motion's mistakes inside gaps.
