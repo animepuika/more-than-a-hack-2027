@@ -56,5 +56,25 @@ class FormationTests(unittest.TestCase):
         self.assertFalse(table['own_half_share_min'].iloc[10:].isna().any())
 
 
+class CalibrationTests(unittest.TestCase):
+    CONFIG = {'dead_start_score': 0.7, 'dead_continue_score': 0.4, 'dead_confirmation_s': 0.2,
+              'restart_confirmation_s': 0.1}
+
+    def test_threshold_rises_until_live_frames_are_clear(self):
+        from solution.deadball_formation import calibrated_dead_mask
+        p = np.r_[np.full(100, 0.97), np.full(50, 0.1), np.full(100, 0.8), np.full(50, 0.1)]  # stop, live, false alarm
+        live = np.r_[np.zeros(100, bool), np.ones(200, bool)]
+        mask, threshold = calibrated_dead_mask(p, np.ones(300, int), self.CONFIG, live, 0.02)
+        self.assertGreater(threshold, 0.8)
+        self.assertTrue(mask[10:90].all() and not mask[110:290].any())
+
+    def test_low_threshold_kept_when_live_frames_are_already_clear(self):
+        from solution.deadball_formation import calibrated_dead_mask
+        p = np.r_[np.full(100, 0.9), np.full(100, 0.1)]
+        mask, threshold = calibrated_dead_mask(p, np.ones(200, int), self.CONFIG, np.r_[np.zeros(100, bool),
+                                               np.ones(100, bool)], 0.02)
+        self.assertEqual(threshold, 0.5)
+
+
 if __name__ == '__main__':
     unittest.main()

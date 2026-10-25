@@ -526,3 +526,17 @@ V13 keeps V12's labels and re-decodes each long ball gap (2 s or more, outside d
 ```
 
 On the bench V13 beats V12 slightly at every level (0.577 / 0.570 / 0.535 / 0.517 against 0.574 / 0.566 / 0.531 / 0.511). On BAR-ATH it raises the answer-free gap-end accuracy from 59% to 64% (team changed: 52% → 58%) and keeps the public Spell F1 of **0.540**: the public window contains almost no long gaps. Results: `results/first_trial_v13.json`.
+
+## Experiments fourteen and fifteen: dead ball, missing players and more data
+
+**V14 — V13 plus confident dead ball** (`run_v14.py`). The V11 formation model's threshold is raised, without answers, until at most 2% of certainly-live frames (a player controls a ball moving faster than 2 m/s) are marked dead. Bench: +0.006 / +0.008 / +0.018 / +0.018 over V13 at 0 / 10 / 25 / 40% hidden ball. BAR-ATH: public Spell F1 **0.554** (dead ball found rises from 7% to 25% of public dead frames); 26.7% of the full match called dead; 2.2% false dead on certainly-live frames. **Current best candidate.**
+
+**V15 — dead-ball model adapted to the match, plus Smart Tagging hints** (`run_v15.py`). Public Spell F1 0.574–0.595, but rejected: it calls 41% of the full match dead with 7.9% false dead on certainly-live frames, and 61–84% dead wherever 20 or fewer players are tracked. The public window happens to have all 22 players tracked.
+
+**Crowd/fight detector** (`crowd_detector.py`, `run_crowd.py`). A fixed rule (at least 6 players from both teams within 5 m, all slower than 1.5 m/s, for 4 s or more). Neutral to slightly negative on the bench (−0.001), so not adopted. It was never tuned on a specific moment of this match.
+
+**Player drop-out test** (`player_masking.py`, `run_player_dropout.py`). Replays BAR-ATH's per-frame missing-player counts onto the bench matches. Missing players cost every method about 0.035. Retraining with drop-out helps when players are missing (V14: +0.010 / +0.006) and costs a little when they are not. Most realistic condition (missing players + 40% hidden ball): V14 retrained **0.498**, V14 0.491, V13 0.481, V7 0.299, smooth50 0.277.
+
+**DFL open data** (`dfl_open.py`). Seven Bundesliga / 2. Bundesliga matches from Bassek et al. (2025), *Scientific Data*, figshare record 28196177, CC-BY 4.0. Download the 21 XML files into `data/external/dfl-open/` (about 2.5 GB, ignored by Git). Each ball frame carries the tracking provider's BallStatus and BallPossession. Findings: dead ball is 41–52% of each match; possession changes 6.5–11 times per live minute (BAR-ATH public: 4.2); **the ball is frozen with exactly zero speed in every dead frame**, an artifact absent from BAR-ATH, so ball-based dead-ball clues must not be trained on it.
+
+Results: `results/first_trial_v14_v15.json`.

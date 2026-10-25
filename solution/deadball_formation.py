@@ -134,3 +134,33 @@ def fit(tables, labels, stride=TRAIN_STRIDE):
 
 def dead_probability(model, table):
     return model.predict_proba(table)[:, 1]
+
+
+def calibrated_dead_mask(p_dead, period, config, live_reference, max_false_rate, fps=25, gap=0.3):
+    """Raise the start threshold until at most `max_false_rate` of certainly-live frames are D.
+
+    `live_reference` marks frames where a player clearly controls a moving ball; no labels
+    are used. The continue threshold stays `gap` below the start threshold, as in V7.
+    Returns (mask, start_threshold).
+    """
+    from .v7_model import dead_mask
+    period = np.asarray(period)
+    live_reference = np.asarray(live_reference, bool)
+
+    def mask(threshold):
+        settings = {**config, 'dead_start_score': threshold, 'dead_continue_score': max(0.05, threshold - gap)}
+        return dead_mask(p_dead, period, settings, fps) & (period > 0)
+
+    def rate(m):
+        return float(m[live_reference].mean()) if live_reference.any() else 0.0
+
+    low, high = 0.5, 0.995
+    if rate(mask(low)) <= max_false_rate:
+        return mask(low), low
+    for _ in range(10):  # false alarms fall as the threshold rises
+        middle = (low + high) / 2
+        if rate(mask(middle)) <= max_false_rate:
+            high = middle
+        else:
+            low = middle
+    return mask(high), high
