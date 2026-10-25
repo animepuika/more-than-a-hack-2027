@@ -508,7 +508,9 @@ All three gains over their parents hold in every paired resample (V12 − V10: +
 
 ### On BAR-ATH so far
 
-V10 is frozen in `data/runs/tenth_trial/`: public Spell F1 **0.4114** (V7 0.4118, V9 0.4000, smooth125 0.4242), a tie within noise. V11's formation model finds 52 of 58 automatically tagged set pieces (V2's rule: 43) but labels 49% of the match as dead ball against V2's 19%, so it is not adopted yet. V12 has not been run on BAR-ATH.
+V10 is frozen in `data/runs/tenth_trial/`: public Spell F1 **0.4114** (V7 0.4118, V9 0.4000, smooth125 0.4242), a tie within noise. V11's formation model finds 52 of 58 automatically tagged set pieces (V2's rule: 43) but labels 49% of the match as dead ball against V2's 19%, so it is not adopted yet.
+
+**V12 on BAR-ATH** (`python -m solution.run_v12`, trained on all three Metrica matches, switch cost fixed at 0.5 s beforehand, frozen before scoring): public Spell F1 **0.540** (90% range 0.39–0.68), frame accuracy 76.3%, against smooth125 0.424 and V7 0.412. It is the first custom method above every official baseline on the public sample. Answer-free checks show one weak spot: after long ball gaps it names the right team 59% of the time, against 64–66% for V10/V9. Results: `results/first_trial_v12_bar_ath.json`.
 
 **Verified:** 114 tests pass; every bench runner reproduces the earlier predictions it compares against. Aggregate results are in `results/first_trial_v10_v12.json`.
 

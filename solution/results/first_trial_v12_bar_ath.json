@@ -1,0 +1,199 @@
+{
+  "experiment": "FirstTrial v12 \u2014 turnover-aware possession model on BAR-ATH",
+  "created_utc": "2026-10-25T15:20:32.038505+00:00",
+  "model_settings": {
+    "max_iter": 400,
+    "learning_rate": 0.05,
+    "max_leaf_nodes": 31,
+    "min_samples_leaf": 200,
+    "l2_regularization": 1.0,
+    "random_state": 2027
+  },
+  "switch_cost_s": 0.5,
+  "training": "All three Metrica matches, recorded ball and 25% hidden live ball (seed 100 + match index)",
+  "dead_mask": "v2_shape_motion D frames (unchanged)",
+  "v7_transfer_reproduced_exactly": true,
+  "answer_free_checks": {
+    "v12_turnover": {
+      "clear_control_agreement": 0.9437605900528256,
+      "transfer_window_agreement": 0.7427609427609427,
+      "gap_ends": {
+        "gaps": 64,
+        "correct": 0.59375,
+        "correct_team_changed": 0.5161290322580645,
+        "correct_team_same": 0.6666666666666666
+      },
+      "full_match_spells": {
+        "spells": 542,
+        "spells_per_live_minute": 6.291547039567872,
+        "median_s": 6.02,
+        "share_under_3s": 0.2878228782287823
+      },
+      "public_window_spells": {
+        "spells": 23,
+        "spells_per_live_minute": 4.6665764912755305,
+        "median_s": 7.56,
+        "share_under_3s": 0.2608695652173913
+      }
+    },
+    "v10_gap_model": {
+      "clear_control_agreement": 0.9989534536031097,
+      "transfer_window_agreement": 1.0,
+      "gap_ends": {
+        "gaps": 64,
+        "correct": 0.640625,
+        "correct_team_changed": 0.5806451612903226,
+        "correct_team_same": 0.696969696969697
+      },
+      "full_match_spells": {
+        "spells": 454,
+        "spells_per_live_minute": 5.270041247165708,
+        "median_s": 7.72,
+        "share_under_3s": 0.22246696035242292
+      },
+      "public_window_spells": {
+        "spells": 18,
+        "spells_per_live_minute": 3.652103340998241,
+        "median_s": 9.559999999999999,
+        "share_under_3s": 0.05555555555555555
+      }
+    },
+    "v9_gap_motion": {
+      "clear_control_agreement": 0.9986295225755009,
+      "transfer_window_agreement": 1.0,
+      "gap_ends": {
+        "gaps": 64,
+        "correct": 0.65625,
+        "correct_team_changed": 0.5806451612903226,
+        "correct_team_same": 0.7272727272727273
+      },
+      "full_match_spells": {
+        "spells": 402,
+        "spells_per_live_minute": 4.666424188018975,
+        "median_s": 8.9,
+        "share_under_3s": 0.1791044776119403
+      },
+      "public_window_spells": {
+        "spells": 19,
+        "spells_per_live_minute": 3.854997971053699,
+        "median_s": 10.76,
+        "share_under_3s": 0.05263157894736842
+      }
+    },
+    "v7_transfer": {
+      "clear_control_agreement": 1.0,
+      "transfer_window_agreement": 1.0,
+      "gap_ends": {
+        "gaps": 64,
+        "correct": 0.53125,
+        "correct_team_changed": 0.2903225806451613,
+        "correct_team_same": 0.7575757575757576
+      },
+      "full_match_spells": {
+        "spells": 374,
+        "spells_per_live_minute": 4.341399617709196,
+        "median_s": 9.08,
+        "share_under_3s": 0.17379679144385027
+      },
+      "public_window_spells": {
+        "spells": 17,
+        "spells_per_live_minute": 3.4492087109427834,
+        "median_s": 9.68,
+        "share_under_3s": 0.058823529411764705
+      }
+    }
+  },
+  "public_results": [
+    {
+      "method": "v12_turnover",
+      "spell_f1": 0.54,
+      "spell_bootstrap_90": [
+        0.39,
+        0.68
+      ],
+      "frame_accuracy": 0.762533,
+      "predicted_possessions": 23
+    },
+    {
+      "method": "baseline_smooth125",
+      "spell_f1": 0.424242,
+      "spell_bootstrap_90": [
+        0.266667,
+        0.593939
+      ],
+      "frame_accuracy": 0.727467,
+      "predicted_possessions": 16
+    },
+    {
+      "method": "v7_transfer",
+      "spell_f1": 0.411765,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ],
+      "frame_accuracy": 0.708,
+      "predicted_possessions": 17
+    },
+    {
+      "method": "v10_gap_model",
+      "spell_f1": 0.411429,
+      "spell_bootstrap_90": [
+        0.274286,
+        0.548571
+      ],
+      "frame_accuracy": 0.708,
+      "predicted_possessions": 18
+    },
+    {
+      "method": "v9_gap_motion",
+      "spell_f1": 0.4,
+      "spell_bootstrap_90": [
+        0.266667,
+        0.533333
+      ],
+      "frame_accuracy": 0.6868,
+      "predicted_possessions": 19
+    },
+    {
+      "method": "baseline_smooth50",
+      "spell_f1": 0.325581,
+      "spell_bootstrap_90": [
+        0.213953,
+        0.446512
+      ],
+      "frame_accuracy": 0.7132,
+      "predicted_possessions": 26
+    },
+    {
+      "method": "baseline_smooth25",
+      "spell_f1": 0.286792,
+      "spell_bootstrap_90": [
+        0.196226,
+        0.384906
+      ],
+      "frame_accuracy": 0.6912,
+      "predicted_possessions": 36
+    },
+    {
+      "method": "baseline_raw",
+      "spell_f1": 0.037838,
+      "spell_bootstrap_90": [
+        0.018919,
+        0.059459
+      ],
+      "frame_accuracy": 0.6512,
+      "predicted_possessions": 131
+    }
+  ],
+  "takeaways": [
+    "V12 public Spell F1 0.540 (90% 0.39-0.68), first custom method above smooth125 0.424; chosen on the bench, predictions frozen before scoring.",
+    "Weak spot: worse than V10/V9 at the ends of long ball gaps (59% vs 64-66%); combining V12 with the V10 gap model is the next candidate.",
+    "Predicts 542 full-match spells (6.29 per live minute vs 6.13 in Metrica truth); 23 vs 17 true in the public window."
+  ],
+  "limitations": [
+    "Trained on event-derived Metrica labels; BAR-ATH answers come from corrected tracking.",
+    "Answer-free checks use V7 control evidence as a reference; V12 sees similar distance clues.",
+    "Public scores reuse 17 inspected spells.",
+    "Offline: uses frames after the current one."
+  ]
+}
