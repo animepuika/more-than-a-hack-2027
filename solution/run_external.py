@@ -25,7 +25,7 @@ from .data import Tracking
 from .external_possession import attach_teams, possession_labels
 from .external_samples import DEFAULT_SAMPLE_ROOT, load_metrica_samples
 from .features import make_features
-from .gap_fallback import GAP_FALLBACK_S, gap_fallback_memory
+from .gap_fallback import GAP_FALLBACK_S, gap_fallback_memory, midpoint_fallback
 from .predict import predict
 from .run import ROOT, DEFAULT_CONFIG, read_config, sha256, write_labels
 from .run_v2 import V2_CONFIG, context_config
@@ -54,7 +54,8 @@ DESCRIPTIONS = {
     'v7_transfer_v3d_overlay': 'Handover arm A: v7_transfer labels with V3 soft D pasted on; ownership unchanged.',
     'v7_transfer_union_redecode': 'Handover arm B: control memory re-decoded with the same V2|V3 D mask as arm A.',
     'v9_gap_motion': 'v7_transfer, but ball gaps of at least 2 s follow V2 motion instead of holding the owner.',
-    'v9_gap_motion_union': 'Arm B (V2|V3 D mask) with the same 2 s V2-motion gap fallback.',
+    'v9_gap_midpoint': 'v9_gap_motion without motion: in a 2 s+ gap the old owner keeps the first half and the next confirmed controller takes the second.',
+    'v9_gap_motion_union':'Arm B (V2|V3 D mask) with the same 2 s V2-motion gap fallback.',
     'v9_gap_motion_union_gap1s': 'Sensitivity: v9_gap_motion_union with a 1 s gap threshold.',
     'v9_gap_motion_union_gap5s': 'Sensitivity: v9_gap_motion_union with a 5 s gap threshold.',
 }
@@ -134,6 +135,10 @@ def run_methods(match, configs, progress):
     motion = models['v2_motion']
     models['v9_gap_motion'] = gap_fallback_memory(features, match.period, v7c, motion, GAP_FALLBACK_S,
                                                   v2, dead=v2 == 'D')[0]
+    midpoint = midpoint_fallback(features, match.period, v7c, models['v7_transfer'], GAP_FALLBACK_S,
+                                 dead=v2 == 'D')
+    models['v9_gap_midpoint'] = gap_fallback_memory(features, match.period, v7c, midpoint, GAP_FALLBACK_S,
+                                                    v2, dead=v2 == 'D')[0]
     for suffix, seconds in [('', GAP_FALLBACK_S), ('_gap1s', 1.0), ('_gap5s', 5.0)]:
         models['v9_gap_motion_union'+suffix] = gap_fallback_memory(features, match.period, v7c, motion,
                                                                   seconds, v2, dead=union)[0]

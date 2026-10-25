@@ -465,3 +465,51 @@ V9 and V7 match the same 11 true spells at IoU 0.3; V9 predicts two extra. That 
 **Verified:** 99 tests pass; V7 is reproduced exactly from light features; all seven BAR-ATH files are valid; the shipped baselines are byte-identical; adding V9 left all 144 earlier bench predictions byte-identical; no V1–V8 source file changed. Aggregate results are in `results/first_trial_v9.json`. Local outputs are under `data/runs/external_bench*/` and `data/runs/ninth_trial/`.
 
 **Limitations:** the external labels are event-derived approximations; gaps are simulated with one random draw per level; dead ball is too easy on Metrica; V8 and tag-based methods could not run there (no Smart Tagging). V9 is offline like V7 and inherits V2 motion's mistakes inside gaps.
+
+## Experiments ten to twelve: learn from the external matches instead of hand rules
+
+V9 showed that hand-written rules are close to their limit. V10–V12 train small models (gradient-boosted trees) on the three Metrica matches, always testing on a match the model has not seen, and score them on the same bench at all four hiding levels.
+
+```powershell
+.\.venv\Scripts\python.exe -m solution.run_external --hide-live-ball 0.40 --out data/runs/external_bench_mid_live40   # and 00/10/25
+.\.venv\Scripts\python.exe -m solution.run_gap_model        # V10 on the bench
+.\.venv\Scripts\python.exe -m solution.run_v10              # V10 on BAR-ATH, frozen and scored
+.\.venv\Scripts\python.exe -m solution.run_deadball_model   # V11 on the bench
+.\.venv\Scripts\python.exe -m solution.run_turnover_model   # V12 on the bench
+```
+
+The bench runners reuse the `run_external` folders and check that earlier predictions are reproduced exactly before scoring anything new.
+
+### What each model does
+
+- **V10 — who has the ball during long gaps** (`gap_model.py`). Uses only player positions: how far each team has pushed up, its defensive line, its width and how these change. From players alone it names the team in possession on 84–89% of live frames in an unseen match. Inside long ball gaps it replaces V9's motion guess.
+- **V11 — dead ball from player formations** (`deadball_formation.py`). Recognises restarts without the ball: everyone in their own half (kick-off), a player at a corner flag, attackers out of the box (goal kick), a player on the touchline (throw-in), a still cluster of teammates (wall), and players slowing down together.
+- **V12 — quick turnovers** (`turnover_model.py`). Learns "who has the ball" from touch clues: which team is close to the ball now and a moment before and after, who touched it last and who touches it next, and sudden changes of ball direction, plus V10's team shape. How readily it switches team is chosen on the training matches only.
+
+### Results on the bench (Spell F1, three matches pooled)
+
+| Method | 0% hidden | 10% | 25% | 40% |
+|---|---:|---:|---:|---:|
+| **V12 turnover model** | **0.574** | **0.566** | **0.531** | **0.511** |
+| V11 (V10 + formation dead ball) | 0.472 | 0.466 | 0.459 | 0.450 |
+| V10 gap model | 0.445 | 0.439 | 0.427 | 0.421 |
+| V9 gap motion | 0.464 | 0.455 | 0.410 | 0.382 |
+| V7 confirmed control | 0.434 | 0.414 | 0.366 | 0.320 |
+| Official smooth50 | 0.415 | 0.401 | 0.347 | 0.297 |
+
+All three gains over their parents hold in every paired resample (V12 − V10: +0.090 to +0.130). The breakdown that motivated V12: 36% of true possessions last under 3 s, and V10 found about 1% of those under 1 s and 8–10% of those lasting 1–3 s. V12 finds 24–32% of the 1–3 s possessions and 60–70% of the 3–10 s ones. Possessions under 1 s are still missed.
+
+### What did not work
+
+- Switching team at the middle of a gap, without motion: no better than V7.
+- Smart Tagging's team as a gap fallback: 54% agreement with clear control, worse than V2 motion at gap ends.
+- Adapting V10 to BAR-ATH's own clear-control frames: no measurable gain, so the Metrica-only model is kept.
+- The broadcast camera: aligned reliably (balls agree within a median 0.85 m), but it sees the ball in only 8% of the tactical camera's missing-ball frames.
+
+### On BAR-ATH so far
+
+V10 is frozen in `data/runs/tenth_trial/`: public Spell F1 **0.4114** (V7 0.4118, V9 0.4000, smooth125 0.4242), a tie within noise. V11's formation model finds 52 of 58 automatically tagged set pieces (V2's rule: 43) but labels 49% of the match as dead ball against V2's 19%, so it is not adopted yet. V12 has not been run on BAR-ATH.
+
+**Verified:** 114 tests pass; every bench runner reproduces the earlier predictions it compares against. Aggregate results are in `results/first_trial_v10_v12.json`.
+
+**Limitations:** the models learn Metrica's event-based labels, which may differ from BAR-ATH's corrected-tracking labels, so part of V12's gain may not transfer. Gaps are simulated with one random draw per level. All methods are offline.

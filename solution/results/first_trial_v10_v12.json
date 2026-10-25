@@ -1,0 +1,573 @@
+{
+  "experiment": "FirstTrial v10-v12 - trained gap, formation dead-ball and turnover models",
+  "scope": "Selection on approximate event-derived Metrica labels (1,145 spells) at 0/10/25/40% hidden live ball, leave one match out; answer-free BAR-ATH checks; BAR-ATH public five minutes only as a sanity check.",
+  "rejected_ideas": {
+    "v9_gap_midpoint": "Switching at the gap midpoint without motion scored like V7 (0.430/0.410/0.359/0.321), far below V9.",
+    "smart_tagging_gap_fallback": "Tag team agrees with clear control 54%; at gap ends 67% vs V2 motion 80%.",
+    "bar_ath_self_labels_for_v10": "Cross-half gap-end accuracy 75.0% vs 76.6% for Metrica-only; no gain.",
+    "broadcast_ball_fill": "Aligned (median ball difference 0.85 m) but covers only 8.0% of missing-ball frames (upper bound 12.8%)."
+  },
+  "model_settings": {
+    "v10": {
+      "max_iter": 300,
+      "learning_rate": 0.05,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 200,
+      "l2_regularization": 1.0,
+      "random_state": 2027
+    },
+    "v11": {
+      "max_iter": 300,
+      "learning_rate": 0.05,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 200,
+      "l2_regularization": 1.0,
+      "random_state": 2027
+    },
+    "v12": {
+      "max_iter": 400,
+      "learning_rate": 0.05,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 200,
+      "l2_regularization": 1.0,
+      "random_state": 2027
+    },
+    "v12_switch_cost_s_chosen_on_training_matches": {
+      "Sample_Game_1": 1.0,
+      "Sample_Game_2": 0.5,
+      "Sample_Game_3": 0.25
+    }
+  },
+  "external_bench": {
+    "0": {
+      "spell_f1": {
+        "v12_turnover": 0.573821,
+        "v11_formation_dead": 0.471672,
+        "v11_formation_dead_only": 0.467443,
+        "v10_gap_model": 0.445121,
+        "v9_gap_midpoint": 0.429615,
+        "v9_gap_motion": 0.463698,
+        "v7_transfer": 0.433829,
+        "baseline_smooth50": 0.414826
+      },
+      "predicted_spells": {
+        "v10_gap_model": 956,
+        "v9_gap_motion": 921,
+        "v7_transfer": 806,
+        "baseline_smooth50": 1499,
+        "v11_formation_dead": 853,
+        "v12_turnover": 1124
+      },
+      "true_spells": 1145,
+      "paired": {
+        "v10 - v9": {
+          "mean": -0.018967,
+          "interval_90": [
+            -0.029503,
+            -0.007676
+          ],
+          "share_first_better": 0.001
+        },
+        "v11 - v10": {
+          "mean": 0.026813,
+          "interval_90": [
+            0.016023,
+            0.037184
+          ],
+          "share_first_better": 1.0
+        },
+        "v11_only - v10": {
+          "mean": 0.022526,
+          "interval_90": [
+            0.01132,
+            0.033784
+          ],
+          "share_first_better": 1.0
+        },
+        "v12 - v10": {
+          "mean": 0.129521,
+          "interval_90": [
+            0.111367,
+            0.147081
+          ],
+          "share_first_better": 1.0
+        }
+      },
+      "match_rate_by_true_spell_length_iou_0.5": {
+        "v12_turnover": {
+          "0-1s": 0.007092,
+          "1-3s": 0.31769,
+          "3-10s": 0.699454,
+          "10-infs": 0.867036
+        },
+        "v10_gap_model": {
+          "0-1s": 0.014184,
+          "1-3s": 0.101083,
+          "3-10s": 0.453552,
+          "10-infs": 0.783934
+        }
+      }
+    },
+    "10": {
+      "spell_f1": {
+        "v12_turnover": 0.565828,
+        "v11_formation_dead": 0.465764,
+        "v11_formation_dead_only": 0.461601,
+        "v10_gap_model": 0.43863,
+        "v9_gap_midpoint": 0.409455,
+        "v9_gap_motion": 0.454741,
+        "v7_transfer": 0.413937,
+        "baseline_smooth50": 0.400455
+      },
+      "predicted_spells": {
+        "v10_gap_model": 957,
+        "v9_gap_motion": 901,
+        "v7_transfer": 778,
+        "baseline_smooth50": 1493,
+        "v11_formation_dead": 850,
+        "v12_turnover": 1120
+      },
+      "true_spells": 1145,
+      "paired": {
+        "v10 - v9": {
+          "mean": -0.01664,
+          "interval_90": [
+            -0.027777,
+            -0.004952
+          ],
+          "share_first_better": 0.012
+        },
+        "v11 - v10": {
+          "mean": 0.027367,
+          "interval_90": [
+            0.016711,
+            0.037869
+          ],
+          "share_first_better": 1.0
+        },
+        "v11_only - v10": {
+          "mean": 0.023195,
+          "interval_90": [
+            0.011776,
+            0.033956
+          ],
+          "share_first_better": 1.0
+        },
+        "v12 - v10": {
+          "mean": 0.128031,
+          "interval_90": [
+            0.109207,
+            0.145838
+          ],
+          "share_first_better": 1.0
+        }
+      },
+      "match_rate_by_true_spell_length_iou_0.5": {
+        "v12_turnover": {
+          "0-1s": 0.007092,
+          "1-3s": 0.303249,
+          "3-10s": 0.685792,
+          "10-infs": 0.858726
+        },
+        "v10_gap_model": {
+          "0-1s": 0.014184,
+          "1-3s": 0.093863,
+          "3-10s": 0.439891,
+          "10-infs": 0.778393
+        }
+      }
+    },
+    "25": {
+      "spell_f1": {
+        "v12_turnover": 0.530861,
+        "v11_formation_dead": 0.45903,
+        "v11_formation_dead_only": 0.462602,
+        "v10_gap_model": 0.426705,
+        "v9_gap_midpoint": 0.359432,
+        "v9_gap_motion": 0.409693,
+        "v7_transfer": 0.36555,
+        "baseline_smooth50": 0.347381
+      },
+      "predicted_spells": {
+        "v10_gap_model": 967,
+        "v9_gap_motion": 877,
+        "v7_transfer": 736,
+        "baseline_smooth50": 1432,
+        "v11_formation_dead": 854,
+        "v12_turnover": 1120
+      },
+      "true_spells": 1145,
+      "paired": {
+        "v10 - v9": {
+          "mean": 0.016544,
+          "interval_90": [
+            0.001863,
+            0.031089
+          ],
+          "share_first_better": 0.966
+        },
+        "v11 - v10": {
+          "mean": 0.032583,
+          "interval_90": [
+            0.02134,
+            0.043328
+          ],
+          "share_first_better": 1.0
+        },
+        "v11_only - v10": {
+          "mean": 0.036131,
+          "interval_90": [
+            0.023974,
+            0.047944
+          ],
+          "share_first_better": 1.0
+        },
+        "v12 - v10": {
+          "mean": 0.104677,
+          "interval_90": [
+            0.085435,
+            0.122638
+          ],
+          "share_first_better": 1.0
+        }
+      },
+      "match_rate_by_true_spell_length_iou_0.5": {
+        "v12_turnover": {
+          "0-1s": 0.007092,
+          "1-3s": 0.263538,
+          "3-10s": 0.628415,
+          "10-infs": 0.833795
+        },
+        "v10_gap_model": {
+          "0-1s": 0.014184,
+          "1-3s": 0.075812,
+          "3-10s": 0.445355,
+          "10-infs": 0.759003
+        }
+      }
+    },
+    "40": {
+      "spell_f1": {
+        "v12_turnover": 0.511268,
+        "v11_formation_dead": 0.4501,
+        "v11_formation_dead_only": 0.45947,
+        "v10_gap_model": 0.421281,
+        "v9_gap_midpoint": 0.320517,
+        "v9_gap_motion": 0.38147,
+        "v7_transfer": 0.319481,
+        "baseline_smooth50": 0.297152
+      },
+      "predicted_spells": {
+        "v10_gap_model": 979,
+        "v9_gap_motion": 841,
+        "v7_transfer": 703,
+        "baseline_smooth50": 1383,
+        "v11_formation_dead": 859,
+        "v12_turnover": 1127
+      },
+      "true_spells": 1145,
+      "paired": {
+        "v10 - v9": {
+          "mean": 0.039299,
+          "interval_90": [
+            0.021886,
+            0.056328
+          ],
+          "share_first_better": 1.0
+        },
+        "v11 - v10": {
+          "mean": 0.029112,
+          "interval_90": [
+            0.017249,
+            0.040288
+          ],
+          "share_first_better": 1.0
+        },
+        "v11_only - v10": {
+          "mean": 0.038531,
+          "interval_90": [
+            0.02592,
+            0.051609
+          ],
+          "share_first_better": 1.0
+        },
+        "v12 - v10": {
+          "mean": 0.090329,
+          "interval_90": [
+            0.072759,
+            0.108132
+          ],
+          "share_first_better": 1.0
+        }
+      },
+      "match_rate_by_true_spell_length_iou_0.5": {
+        "v12_turnover": {
+          "0-1s": 0.0,
+          "1-3s": 0.238267,
+          "3-10s": 0.601093,
+          "10-infs": 0.819945
+        },
+        "v10_gap_model": {
+          "0-1s": 0.014184,
+          "1-3s": 0.083032,
+          "3-10s": 0.434426,
+          "10-infs": 0.753463
+        }
+      }
+    }
+  },
+  "leave_one_match_out_screens": {
+    "v10_frame_accuracy": {
+      "Sample_Game_1": 0.837857,
+      "Sample_Game_2": 0.844856,
+      "Sample_Game_3": 0.891816
+    },
+    "v11_dead_precision_recall": {
+      "Sample_Game_1": [
+        0.816589,
+        0.828479
+      ],
+      "Sample_Game_2": [
+        0.780665,
+        0.849096
+      ],
+      "Sample_Game_3": [
+        0.875469,
+        0.770845
+      ]
+    }
+  },
+  "bar_ath_answer_free": {
+    "v10_training_set_comparison": {
+      "metrica": {
+        "self_label_agreement_other_half": 0.8414233030997708,
+        "transfer_window_agreement": 0.6154882154882155,
+        "gap_ends": 64,
+        "gap_end_accuracy": 0.765625,
+        "gap_end_accuracy_team_changed": 0.7096774193548387,
+        "gap_end_accuracy_team_same": 0.8181818181818182
+      },
+      "bar_self": {
+        "self_label_agreement_other_half": 0.8435163958935513,
+        "transfer_window_agreement": 0.6202020202020202,
+        "gap_ends": 64,
+        "gap_end_accuracy": 0.75,
+        "gap_end_accuracy_team_changed": 0.6129032258064516,
+        "gap_end_accuracy_team_same": 0.8787878787878788
+      },
+      "metrica_plus_bar_self": {
+        "self_label_agreement_other_half": 0.847877005880594,
+        "transfer_window_agreement": 0.6258136924803591,
+        "gap_ends": 64,
+        "gap_end_accuracy": 0.75,
+        "gap_end_accuracy_team_changed": 0.6774193548387096,
+        "gap_end_accuracy_team_same": 0.8181818181818182
+      }
+    },
+    "v10_chosen": "metrica",
+    "v10_gap_end_check": {
+      "all": {
+        "held": {
+          "gaps": 64,
+          "coverage": 1.0,
+          "correct": 0.516
+        },
+        "v2_motion": {
+          "gaps": 64,
+          "coverage": 0.469,
+          "correct": 0.8
+        },
+        "model": {
+          "gaps": 64,
+          "coverage": 1.0,
+          "correct": 0.766
+        }
+      },
+      "owner_changed": {
+        "held": {
+          "gaps": 31,
+          "coverage": 1.0,
+          "correct": 0.0
+        },
+        "v2_motion": {
+          "gaps": 31,
+          "coverage": 0.581,
+          "correct": 0.722
+        },
+        "model": {
+          "gaps": 31,
+          "coverage": 1.0,
+          "correct": 0.71
+        }
+      },
+      "owner_same": {
+        "held": {
+          "gaps": 33,
+          "coverage": 1.0,
+          "correct": 1.0
+        },
+        "v2_motion": {
+          "gaps": 33,
+          "coverage": 0.364,
+          "correct": 0.917
+        },
+        "model": {
+          "gaps": 33,
+          "coverage": 1.0,
+          "correct": 0.818
+        }
+      }
+    },
+    "v11_formation_dead_check": {
+      "set_piece_tags_with_D_in_3s_before_to_1s_after": {
+        "Kick Off (After Goal)": {
+          "tags": 4,
+          "formation": 4,
+          "v2": 4
+        },
+        "Kick Off (Start)": {
+          "tags": 1,
+          "formation": 1,
+          "v2": 1
+        },
+        "Corner Kick": {
+          "tags": 12,
+          "formation": 12,
+          "v2": 12
+        },
+        "Throw-in": {
+          "tags": 26,
+          "formation": 21,
+          "v2": 18
+        },
+        "Goal Kick": {
+          "tags": 10,
+          "formation": 9,
+          "v2": 4
+        },
+        "Free Kick": {
+          "tags": 5,
+          "formation": 5,
+          "v2": 4
+        },
+        "all": {
+          "tags": 58,
+          "formation": 52,
+          "v2": 43
+        }
+      },
+      "false_alarm_on_clear_moving_ball_frames": {
+        "frames": 30584,
+        "formation": 0.13693434475542768,
+        "v2": 0.004315982212921789
+      },
+      "predicted_dead_share_of_graded": {
+        "formation": 0.48641860289442707,
+        "v2": 0.18655772172456989,
+        "union": 0.494765732702997
+      },
+      "dead_intervals": {
+        "formation": 170,
+        "v2": 181
+      }
+    },
+    "broadcast_alignment": {
+      "offsets": {
+        "half1_median": 4014.0,
+        "half2_median": 26920.0
+      },
+      "broadcast_frames_aligned_share": 0.5454075677253052,
+      "ball_validation": {
+        "frames": 67330,
+        "median_m": 0.8487382426048478,
+        "within_2m": 0.7457893955146294,
+        "within_5m": 0.8939105896331502
+      },
+      "tactical_graded_frames": 158857,
+      "graded_with_aligned_broadcast": 0.5397432911360531,
+      "tactical_ball_missing_frames": 64643,
+      "missing_ball_recovered_by_broadcast": 0.07991584548984422,
+      "long_gap_frames": 64568,
+      "long_gap_recovered_by_broadcast": 0.07931173336637344,
+      "long_gap_with_broadcast_view_any": 0.26026824433155743
+    }
+  },
+  "bar_ath_public_results": [
+    {
+      "method": "baseline_smooth125",
+      "spell_f1": 0.424242,
+      "spell_bootstrap_90": [
+        0.266667,
+        0.593939
+      ],
+      "predicted_possessions": 16
+    },
+    {
+      "method": "v7_transfer",
+      "spell_f1": 0.411765,
+      "spell_bootstrap_90": [
+        0.270588,
+        0.552941
+      ],
+      "predicted_possessions": 17
+    },
+    {
+      "method": "v10_gap_model",
+      "spell_f1": 0.411429,
+      "spell_bootstrap_90": [
+        0.274286,
+        0.548571
+      ],
+      "predicted_possessions": 18
+    },
+    {
+      "method": "v9_gap_motion",
+      "spell_f1": 0.4,
+      "spell_bootstrap_90": [
+        0.266667,
+        0.533333
+      ],
+      "predicted_possessions": 19
+    },
+    {
+      "method": "baseline_smooth50",
+      "spell_f1": 0.325581,
+      "spell_bootstrap_90": [
+        0.213953,
+        0.446512
+      ],
+      "predicted_possessions": 26
+    },
+    {
+      "method": "baseline_smooth25",
+      "spell_f1": 0.286792,
+      "spell_bootstrap_90": [
+        0.196226,
+        0.384906
+      ],
+      "predicted_possessions": 36
+    },
+    {
+      "method": "baseline_raw",
+      "spell_f1": 0.037838,
+      "spell_bootstrap_90": [
+        0.018919,
+        0.059459
+      ],
+      "predicted_possessions": 131
+    }
+  ],
+  "takeaways": [
+    "Lost spells were mostly short possessions: 36% of true spells last under 3 s and V10 found 1% (<1 s) and 8-10% (1-3 s).",
+    "V12 turnover model: +0.090 to +0.130 over V10 on the bench; 1-3 s spells found 24-32%, 3-10 s 60-70%. Not yet run on BAR-ATH.",
+    "V11 formation dead ball: +0.027 to +0.033 over V10 on the bench, but labels 49% of BAR-ATH as dead (V2: 19%); not adopted.",
+    "V10 gap model: beats V9 at 25-40% hidden ball; transfers to BAR-ATH at 84% agreement with clear control; public 0.4114.",
+    "Dead ball explains few lost spells on the bench (27 of 1,145 merges); turnovers explain most."
+  ],
+  "limitations": [
+    "Event-derived Metrica labels may differ from BAR-ATH corrected-tracking labels; V12 may partly learn Metrica labelling style.",
+    "Simulated live-ball gaps, one random draw per level; Metrica dead ball is easier than BAR-ATH.",
+    "BAR-ATH public scores reuse 17 inspected spells and contain 35 s of long gaps.",
+    "All methods are offline and use frames after the current one."
+  ]
+}

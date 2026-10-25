@@ -7,6 +7,7 @@ confirmation/backdating behave exactly as in v7_sequence.control_memory.
 """
 import numpy as np
 
+from .features import runs
 from .v7_labels import period_runs
 from .v7_sequence import control_evidence
 
@@ -25,6 +26,40 @@ def long_gap_mask(reliable, period, min_frames):
             if hi - lo >= min_frames:
                 mask[a+lo:a+hi] = True
     return mask
+
+
+def midpoint_fallback(features, period, config, held, gap_min_s, dead=None, fps=25):
+    """Motion-free fallback: in each long gap, the owner before it keeps the first half
+    and the next team with confirmed direct control after it takes the second half.
+
+    The search after a gap stops at the first D frame. Either side missing copies the
+    other; both missing leaves the gap empty, so control memory simply holds.
+    """
+    direct = control_evidence(features, config)
+    held = np.asarray(held)
+    dead = np.zeros(len(direct), bool) if dead is None else np.asarray(dead, bool)
+    needed = max(1, round(config['transfer_confirmation_s']*fps))
+    gaps = long_gap_mask(features['ball_reliable'] == 1, period, max(1, round(gap_min_s*fps)))
+    fallback = np.full(len(direct), '', dtype='<U1')
+    for a, b in period_runs(period):
+        if period[a] <= 0:
+            continue
+        for lo, hi in runs(gaps[a:b]):
+            lo, hi = a+lo, a+hi
+            before = held[lo-1] if lo > a and held[lo-1] in ('H', 'A') else ''
+            stops = np.flatnonzero(dead[hi:b])
+            values = direct[hi:hi+stops[0] if len(stops) else b]
+            after = ''
+            if len(values):
+                edges = np.r_[0, np.flatnonzero(values[1:] != values[:-1]) + 1, len(values)]
+                for s, e in zip(edges[:-1], edges[1:]):
+                    if values[s] >= 0 and e - s >= needed:
+                        after = 'HA'[values[s]]
+                        break
+            before, after = before or after, after or before
+            middle = (lo + hi) // 2
+            fallback[lo:middle], fallback[middle:hi] = before, after
+    return fallback
 
 
 def gap_fallback_memory(features, period, config, fallback, gap_min_s, initial_labels=None,

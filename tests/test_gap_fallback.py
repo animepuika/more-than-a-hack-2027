@@ -4,7 +4,7 @@ from pathlib import Path
 import unittest
 import numpy as np
 
-from solution.gap_fallback import gap_fallback_memory, long_gap_mask
+from solution.gap_fallback import gap_fallback_memory, long_gap_mask, midpoint_fallback
 from solution.v7_sequence import control_memory
 
 CONFIG = json.loads((Path(__file__).resolve().parents[1]/'solution/config_v7.json').read_text())
@@ -51,6 +51,29 @@ class GapFallbackTests(unittest.TestCase):
                                         np.full(120, 'A'), 2.0, dead=dead)
         self.assertTrue((labels[50:70] == 'D').all())
         self.assertTrue((labels[30:50] == 'A').all() and (labels[70:90] == 'A').all())
+
+
+class MidpointFallbackTests(unittest.TestCase):
+    def test_switches_at_gap_midpoint_when_owners_differ(self):
+        owners = [0]*30 + [-1]*60 + [1]*30
+        held = np.array(['H']*120)
+        fallback = midpoint_fallback(evidence(owners), np.ones(120), CONFIG, held, 2.0)
+        self.assertEqual(''.join(fallback[30:90]), 'H'*30 + 'A'*30)
+        self.assertTrue((fallback[:30] == '').all() and (fallback[90:] == '').all())
+        labels, _ = gap_fallback_memory(evidence(owners), np.ones(120), CONFIG, fallback, 2.0)
+        self.assertEqual(''.join(labels), 'H'*60 + 'A'*60)
+
+    def test_brief_control_after_gap_is_not_the_new_owner(self):
+        owners = [0]*30 + [-1]*60 + [1]*5 + [0]*25
+        fallback = midpoint_fallback(evidence(owners), np.ones(120), CONFIG, np.array(['H']*120), 2.0)
+        self.assertTrue((fallback[30:90] == 'H').all())
+
+    def test_dead_ball_after_gap_stops_the_search(self):
+        owners = [0]*30 + [-1]*60 + [2]*15 + [1]*15  # 2: ball visible, nobody in control
+        dead = np.zeros(120, bool); dead[95:105] = True
+        fallback = midpoint_fallback(evidence(owners), np.ones(120), CONFIG, np.array(['H']*120), 2.0,
+                                     dead=dead)
+        self.assertTrue((fallback[30:90] == 'H').all())
 
 
 if __name__ == '__main__':
