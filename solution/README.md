@@ -515,3 +515,14 @@ V10 is frozen in `data/runs/tenth_trial/`: public Spell F1 **0.4114** (V7 0.4118
 **Verified:** 114 tests pass; every bench runner reproduces the earlier predictions it compares against. Aggregate results are in `results/first_trial_v10_v12.json`.
 
 **Limitations:** the models learn Metrica's event-based labels, which may differ from BAR-ATH's corrected-tracking labels, so part of V12's gain may not transfer. Gaps are simulated with one random draw per level. All methods are offline.
+
+## Experiment thirteen: V12 plus V10 inside long gaps (current best)
+
+V13 keeps V12's labels and re-decodes each long ball gap (2 s or more, outside dead ball) with V10's ball-free model, anchored to V12's team before the gap and the first confirmed controller after it. It adds no settings.
+
+```powershell
+.\.venv\Scripts\python.exe -m solution.run_v13 bench     # practice matches, against saved V12/V10
+.\.venv\Scripts\python.exe -m solution.run_v13 bar-ath   # BAR-ATH, from frozen V12 and saved V10 probabilities
+```
+
+On the bench V13 beats V12 slightly at every level (0.577 / 0.570 / 0.535 / 0.517 against 0.574 / 0.566 / 0.531 / 0.511). On BAR-ATH it raises the answer-free gap-end accuracy from 59% to 64% (team changed: 52% → 58%) and keeps the public Spell F1 of **0.540**: the public window contains almost no long gaps. Results: `results/first_trial_v13.json`.
