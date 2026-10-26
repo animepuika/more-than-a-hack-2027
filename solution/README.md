@@ -547,7 +547,7 @@ Results: `results/first_trial_v14_v15.json`.
 
 **Speed.** `feature_cache.py` stores each match's expensive features on disk (keyed by the input arrays and the code that computes them); `run_bench10.py` computes them in parallel worker processes. Repeat experiments skip the feature step.
 
-**V16 — dead ball learned on ten matches** (`deadball_v16.py`, `run_v16.py`). Player formations only: Metrica's ball vanishes and DFL's ball is frozen at every stoppage, so ball clues would teach a shortcut. On unseen practice matches it finds 83–92% of dead ball at 76–95% precision (+0.049 over V13 in realistic conditions). On BAR-ATH it marks certainly-live play dead 61% of the time when 18 or fewer players are tracked, so the plain version is rejected. **V16 gated + calibrated** (trusted only where 21+ players are tracked, 2% answer-free calibration) keeps false dead ball at or below 2.4% in every coverage group and scores **0.546** publicly. It is the recommended candidate.
+**V16 — dead ball learned on ten matches** (`deadball_v16.py`, `run_v16.py`). Player formations only: Metrica's ball vanishes and DFL's ball is frozen at every stoppage, so ball clues would teach a shortcut. On unseen practice matches it finds 83–92% of dead ball at 76–95% precision (+0.049 over V13 in realistic conditions). On BAR-ATH it marks certainly-live play dead 61% of the time when 18 or fewer players are tracked, so the plain version is rejected. **V16 gated + calibrated** (trusted only where 21+ players are tracked, 2% answer-free calibration) keeps false dead ball at or below 2.4% in every coverage group and scores **0.546** publicly. It was the recommended candidate until V20 and is now the backup.
 
 **Why players disappear on BAR-ATH.** Track endings measured from tracking only: players vanish 26× more often beyond a line and 3.6× more often within 3 m of one; distance to the ball does not matter. `player_masking.py` can now replay drop-outs with these edge weights (`pitch=` argument). This makes the practice matches more realistic, but training on it does not remove the over-calling on BAR-ATH, so the gate stays.
 
@@ -568,3 +568,20 @@ Extract the sound once with `ffmpeg -i data/broadcast/BAR-ATH_broadcast.mp4 -vn 
 **What the sound gives.** The two broadcast channels are identical, so commentary cannot be separated out. Learned only from the automatic kick-off tags, the referee's whistle is a pair of steady tones near 4.3 kHz and about 10% lower (crowd whistling is a single tone). Detector v3 keeps tone pairs as strong as the kick-off whistles: 0.77 per minute of play, and players slow down after them by 0.27 m/s more than at random times.
 
 **Why it is not used.** All checks were fixed before each run. v3 fails two of three (slowdown just under the 0.3 m/s bar; set pieces no more often after a whistle than random times). Against V16 gated's dead-ball starts, 20.7% of whistles have one from 2 s before to 5 s after, against 15.1% for time-shifted whistles (1.4×, below the 2× needed). None of the practice matches has sound, so a whistle could only enter as a hand-set rule. Whistles therefore stay out of every prediction. An unexplained lead: whistles with no V16 dead ball within 10 s show the biggest slowdown (−0.57 m/s).
+
+## Experiment twenty: dead ball while the broadcast cuts away (recommended candidate)
+
+TV directors cut to close-ups and replays when play stops. A tactical frame counts as a cutaway when its broadcast frame (constant offset per half, measured from player positions) has no valid homography. Run `python -m solution.run_camera_cutaway` for the check and `python -m solution.run_v20` for V20; outputs go to `data/runs/camera_cutaway/` and `data/runs/twentieth_trial/`.
+
+**The clue** (`run_camera_cutaway.py`). On SkillCorner's 20 broadcast matches, 91.5% of cutaway time is dead ball and cutaways cover 73% of dead ball, in every match. SkillCorner builds its phases partly from its own tracking, so this may be flattering. On BAR-ATH, 33% of graded play is cutaway, players move slower there (0.95 vs 1.58 m/s), and set pieces follow cutaways more often than random times. But 8.1% of certainly-live frames fall in cutaways (rule: under 5%), mostly at the edges, where replays run past the restart.
+
+**V20** (`camera_cutaway.py`, `run_v20.py`). V16 gated + calibrated plus dead ball during cutaways, with the first 3 s and last 6 s of each cutaway dropped (at least 2 s must remain). The main tracking keeps running during cutaways, so it decides the restart: dead ball ends when the players' 1-second mean speed passes 2 m/s. Pass rules were fixed before the run. Trimmed cutaways are 98.2% dead on SkillCorner but cover only 42.3% of dead ball (rule A needed 50%). The user overrode rule A as a coverage rule, not a safety rule, and the manifest records this. On BAR-ATH all answer-free rules pass:
+
+| Answer-free check (full match) | V16 gated | V20 |
+|---|---|---|
+| False dead ball on certainly-live frames (at most 4%) | 2.3% | 3.8% |
+| Dead-ball share (30–50%) | 22.8% | 30.8% |
+| Set-piece tags with dead ball nearby (at least 44 of 58) | 44 | 45 |
+| Possessions per live minute (at most 7.9) | 6.33 | 6.46 |
+
+Public sanity check: Spell F1 **0.533** vs 0.546 (within noise); dead-ball F1 0.52 vs 0.37 (recall 37% vs 24%, precision 88% vs 83%); macro F1 0.746 vs 0.687. Because the full match has far more dead ball than the public five minutes, **V20 is the recommended candidate** and V16 gated + calibrated is the backup. No practice match has both a broadcast and a main tracking, so V20 has no practice-match score.
