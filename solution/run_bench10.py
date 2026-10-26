@@ -8,6 +8,8 @@ Variants added to V13's labels:
   v16            formation model trained on the other nine matches, standard thresholds
   v16_cal        V16 with the 2% calibration
   v16_gated_cal  V16 trusted only where 21+ players are tracked, with the 2% calibration
+  v16_gated_cal_lines  v16_gated_cal plus dead ball after line exits and restarts from the edge
+                 (solution/line_restarts.py)
 Conditions: clean (as recorded) and realistic (BAR-ATH-like player drop-out, ball hidden in 30% of
 live and 35% of dead frames). Leave one match out. Outputs stay under data/; no commit or push.
 """
@@ -32,7 +34,7 @@ CALIBRATION = 0.02
 DFL_SWITCH_COST = 0.5
 SWITCH_COST = {'Sample_Game_1': 1.0, 'Sample_Game_2': 0.5, 'Sample_Game_3': 0.25}
 SEEDS = {'train_realistic': 900, 'test_realistic': 500, 'ball25': 100, 'train_edge': 900, 'test_edge': 500}
-VARIANTS = ['v13', 'v14', 'v14_gated', 'v16', 'v16_cal', 'v16_gated_cal', 'v16_gated_cal_bridged']
+VARIANTS = ['v13', 'v14', 'v14_gated', 'v16', 'v16_cal', 'v16_gated_cal', 'v16_gated_cal_bridged', 'v16_gated_cal_lines']
 
 
 def load_sources(kinds=('metrica', 'dfl')):
@@ -116,6 +118,8 @@ def main(argv=None):
     parser.add_argument('--dropout', choices=['random', 'edge'], default='random',
                         help='How realistic copies lose players: uniformly or with BAR-ATH edge weights')
     parser.add_argument('--bar-ath', action='store_true', help='Also run answer-free BAR-ATH dead-ball checks')
+    parser.add_argument('--save-tuning', action='store_true',
+                        help='Also predict on the training-seed copies and save V13 and V16 gated labels for timing tuning')
     args = parser.parse_args(argv)
     out = args.out.resolve()
     if not out.is_relative_to((ROOT/'data').resolve()) or (out.exists() and any(out.iterdir())):
@@ -133,6 +137,7 @@ def main(argv=None):
     from .v7_model import dead_mask
     from .v7_sequence import control_evidence
     from .deadball_bridge import bridge_blind_spots
+    from .line_restarts import line_restart_dead
     v7c = json.loads(V7_CONFIG.read_text())
     train_v, test_v = (('train_edge', 'test_edge') if args.dropout == 'edge'
                        else ('train_realistic', 'test_realistic'))
@@ -176,8 +181,12 @@ def main(argv=None):
     progress('Models trained.')
 
     preds, checks = {c: {} for c in ('clean', 'realistic')}, {}
+    line_counts = {c: np.zeros(4) for c in ('clean', 'realistic', 'tune')}
+    if args.save_tuning:
+        preds['tune'] = {}
+    conditions = (('clean', 'recorded'), ('realistic', test_v)) + ((('tune', train_v),) if args.save_tuning else ())
     for i, s in enumerate(sources):
-        for condition, version in (('clean', 'recorded'), ('realistic', test_v)):
+        for condition, version in conditions:
             m, b = get_bundle(s, i, version)
             feats = features_dict(b)
             bf = (b['bf_home'], b['bf_away'])
@@ -201,8 +210,13 @@ def main(argv=None):
             # Bridge on the candidate's final dead-ball decision (V13's D plus the gated formation D).
             masks['v16_gated_cal_bridged'] = bridge_blind_spots(masks['v16_gated_cal'] | (v13 == 'D'), full | ~active,
                                                                 m.period, m.ball_xy_m, m.pitch, m.fps)
+            masks['v16_gated_cal_lines'] = masks['v16_gated_cal'] | line_restart_dead(m.ball_xy_m, m.player_xy_m, m.period,
+                                                                                      m.pitch, m.fps)
             preds[condition][s['name']] = {'v13': v13, **{k: overlay(v13, mask, active) for k, mask in masks.items()}}
             graded = s['labels'] != 'X'
+            added = (preds[condition][s['name']]['v16_gated_cal_lines'] == 'D') & (preds[condition][s['name']]['v16_gated_cal'] != 'D') & graded
+            line_counts[condition] += [added.sum(), (added & (s['labels'] == 'D')).sum(),
+                                       ((preds[condition][s['name']]['v16_gated_cal_lines'] == 'D') & live_ref).sum(), live_ref.sum()]
             checks[f"{condition}/{s['name']}"] = {k: {
                 'false_dead_on_live_ref': float((v == 'D')[live_ref].mean()) if live_ref.any() else None,
                 'dead_precision': float((s['labels'][(v == 'D') & graded] == 'D').mean()) if ((v == 'D') & graded).any() else None,
@@ -223,12 +237,19 @@ def main(argv=None):
             paired = {f'{k} - v13': paired_difference(gt, joined[k], joined['v13']) for k in VARIANTS[1:]}
             paired.update({f'{k} - v14': paired_difference(gt, joined[k], joined['v14']) for k in ('v14_gated', 'v16_gated_cal')})
             paired['v16_gated_cal_bridged - v16_gated_cal'] = paired_difference(gt, joined['v16_gated_cal_bridged'], joined['v16_gated_cal'])
+            paired['v16_gated_cal_lines - v16_gated_cal'] = paired_difference(gt, joined['v16_gated_cal_lines'], joined['v16_gated_cal'])
             results[f'{condition}/{group}'] = {'spell_f1': scores, 'paired': paired}
             progress(f'{condition}/{group}: ' + '  '.join(f'{k} {v:.4f}' for k, v in scores.items()))
             progress('   ' + '  '.join(f"{k}: {v['mean']:+.4f} ({v['share_first_better']:.0%})" for k, v in paired.items()))
+    if args.save_tuning:
+        np.savez_compressed(out/'tuning_labels.npz', **{f'{c}|{n}|{k}': preds[c][n][k] for c in preds for n in preds[c]
+                                                        for k in ('v13', 'v16_gated_cal')})
+    lines = {c: {'added_frames': int(v[0]), 'added_truly_dead': float(v[1] / max(v[0], 1)),
+                 'false_dead_on_live_ref': float(v[2] / max(v[3], 1))} for c, v in line_counts.items()}
+    progress(f'line restarts: {lines}')
     (out/'bench10_results.json').write_text(json.dumps(
         {'created_utc': datetime.now(timezone.utc).isoformat(), 'gate_players': GATE_PLAYERS, 'calibration': CALIBRATION,
-         'dropout': args.dropout, 'results': results, 'checks': checks,
+         'dropout': args.dropout, 'results': results, 'checks': checks, 'line_restarts': lines,
          'source_sha256': {q.name: sha256(q) for q in sorted((ROOT/'solution').glob('*.py'))}}, indent=2, default=float)+'\n')
 
     if args.bar_ath:

@@ -585,3 +585,19 @@ TV directors cut to close-ups and replays when play stops. A tactical frame coun
 | Possessions per live minute (at most 7.9) | 6.33 | 6.46 |
 
 Public sanity check: Spell F1 **0.533** vs 0.546 (within noise); dead-ball F1 0.52 vs 0.37 (recall 37% vs 24%, precision 88% vs 83%); macro F1 0.746 vs 0.687. Because the full match has far more dead ball than the public five minutes, **V20 is the recommended candidate** and V16 gated + calibrated is the backup. No practice match has both a broadcast and a main tracking, so V20 has no practice-match score.
+
+## Experiment twenty-one: throw-in and goal-kick detector (rejected, parked)
+
+`line_restarts.py` marks dead ball from three tracking cues, fixed from general football knowledge: the ball seen at least 0.5 m beyond a touchline or goal line; a player who was on the pitch standing still beyond a touchline while the ball is out of play (a throw-in taker); and the ball put into play from a touchline or corner after the players were calm. Practice data treats the ball unnaturally after it leaves the pitch, so only the moment of crossing is used. The bench variant `v16_gated_cal_lines` is in `run_bench10.py`. `run_v21.py` applies it on top of V20, and `run_v21_timing.py` picks the restart timing on one set of practice copies and judges it on a separately generated set.
+
+| Rule (fixed before each run) | Needed | V21 | V21b (tuned timing) |
+|---|---|---|---|
+| P1 practice Spell F1 change (realistic) | at least +0.005 | +0.011 | +0.010 |
+| P2 added dead frames truly dead | at least 80% | 68% | 78.4% |
+| P3 false dead on the live reference | at most 4% | 2.6% | 2.4% |
+| B1 BAR-ATH false dead on certainly-live frames | at most 4.5% | 5.3% | 4.3% |
+| B2 throw-ins / goal kicks dead in the 15 s before | 45% / 50% | 49% / 46% | 48% / 42.5% |
+| B3 BAR-ATH dead share | at most 50% | 36% | 35% |
+| B4 possessions per live minute | at most 7.9 | 6.24 | 6.29 |
+
+Each cue alone is 89–95% truly dead on the practice matches; most errors are restarts detected late. **Both versions fail P2 and B2, so neither is used; V20 stays the recommended candidate.** V21b was the second look at BAR-ATH's answer-free checks. Worth revisiting if the ball can be recovered from the tactical video, which would show more balls leaving the pitch.
