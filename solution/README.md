@@ -540,3 +540,23 @@ On the bench V13 beats V12 slightly at every level (0.577 / 0.570 / 0.535 / 0.51
 **DFL open data** (`dfl_open.py`). Seven Bundesliga / 2. Bundesliga matches from Bassek et al. (2025), *Scientific Data*, figshare record 28196177, CC-BY 4.0. Download the 21 XML files into `data/external/dfl-open/` (about 2.5 GB, ignored by Git). Each ball frame carries the tracking provider's BallStatus and BallPossession. Findings: dead ball is 41–52% of each match; possession changes 6.5–11 times per live minute (BAR-ATH public: 4.2); **the ball is frozen with exactly zero speed in every dead frame**, an artifact absent from BAR-ATH, so ball-based dead-ball clues must not be trained on it.
 
 Results: `results/first_trial_v14_v15.json`.
+
+## Experiments sixteen to nineteen: ten practice matches, calm possession and a first look at sound
+
+**Data added.** Besides Metrica and DFL, `skillcorner_open.py` loads SkillCorner's open A-League 2024/25 matches (github.com/SkillCorner/opendata, MIT licence, © SkillCorner): broadcast tracking at 10 fps with per-player detection flags, resampled to 25 fps; possession and dead ball come from their phases of play. Download the match folders (tracking via Git LFS) into `data/external/skillcorner/` (about 1.8 GB, ignored by Git). SkillCorner's possession is calm (3.3–5.6 changes per live minute, like BAR-ATH's public 4.2). Its broadcast cuts away during stoppages (no players detected), so it is used for possession, not to judge dead ball.
+
+**Speed.** `feature_cache.py` stores each match's expensive features on disk (keyed by the input arrays and the code that computes them); `run_bench10.py` computes them in parallel worker processes. Repeat experiments skip the feature step.
+
+**V16 — dead ball learned on ten matches** (`deadball_v16.py`, `run_v16.py`). Player formations only: Metrica's ball vanishes and DFL's ball is frozen at every stoppage, so ball clues would teach a shortcut. On unseen practice matches it finds 83–92% of dead ball at 76–95% precision (+0.049 over V13 in realistic conditions). On BAR-ATH it marks certainly-live play dead 61% of the time when 18 or fewer players are tracked, so the plain version is rejected. **V16 gated + calibrated** (trusted only where 21+ players are tracked, 2% answer-free calibration) keeps false dead ball at or below 2.4% in every coverage group and scores **0.546** publicly. It is the recommended candidate.
+
+**Why players disappear on BAR-ATH.** Track endings measured from tracking only: players vanish 26× more often beyond a line and 3.6× more often within 3 m of one; distance to the ball does not matter. `player_masking.py` can now replay drop-outs with these edge weights (`pitch=` argument). This makes the practice matches more realistic, but training on it does not remove the over-calling on BAR-ATH, so the gate stays.
+
+**V17 — possession trained on calm labels** (`run_v17.py`). Turnover and gap models trained on Metrica plus SkillCorner, leave one match out. SkillCorner exam: 0.37 → **0.47** (visible frames 0.49 → 0.61); Metrica level. On BAR-ATH: right after long gaps 65.6% (V16 gated 64.1%), calmer possession; public 0.516.
+
+**V18 — all twenty SkillCorner matches and a high-ball input** (`aerial_model.py`, `run_v18.py`). The high-ball detector, trained on SkillCorner's ball heights and using x/y only, ranks aerial balls well on unseen matches (AUC 0.90–0.95) but barely changes possession scores. More SkillCorner data: +0.01 on SkillCorner, −0.015 on Metrica; best BAR-ATH gap-end accuracy (67%), public 0.476.
+
+**V19 — filling dead-ball blind spots** (`deadball_bridge.py`, `run_v19.py`). Low-coverage stretches take dead ball when both sides are dead, or one side is dead and the ball last left over a line. −0.003 on the realistic bench with more false dead ball, so not adopted.
+
+**Whistle, first attempt** (`whistle_audio.py`, `run_whistle.py`). The official broadcast video has a stereo sound track that maps onto tactical frames with the broadcast alignment. A simple tone detector finds about 27 events per minute, mostly not the referee: players' speed hardly changes after them. Next: separate the stereo channels and learn the whistle's sound from tracking-detected stoppage starts. Commentary is not used.
+
+**Open question.** Calm possession training wins on SkillCorner and on BAR-ATH's answer-free checks, but scores lower on the 17 public spells (0.546 → 0.516 → 0.476, each step within noise). Results: `results/first_trial_v16_v19.json`.

@@ -12,6 +12,17 @@ import pandas as pd
 from .v7_labels import period_runs
 
 FULL_TEAM = 22
+# How much more often BAR-ATH loses a player by distance to the nearest line (m; negative = off the pitch),
+# measured from track endings against all visible players, from tracking only (no answers), 26 Oct 2026.
+EDGE_BINS = np.array([0.0, 3.0, 6.0, 10.0, 15.0, 25.0])
+EDGE_WEIGHTS = np.array([26.31, 3.57, 1.28, 0.98, 1.02, 0.65, 0.59])
+
+
+def edge_weights(points, pitch):
+    """Drop-out weight per player position from its distance to the nearest touchline or goal line."""
+    length, width = pitch
+    edge = np.minimum.reduce([points[:, 0], length - points[:, 0], points[:, 1], width - points[:, 1]])
+    return EDGE_WEIGHTS[np.searchsorted(EDGE_BINS, edge, side='right')]
 
 
 def bar_ath_missing_counts(features_csv):
@@ -21,8 +32,11 @@ def bar_ath_missing_counts(features_csv):
     return np.clip(FULL_TEAM - observed, 0, FULL_TEAM).astype(int)
 
 
-def drop_players(player_xy, period, missing, seed):
-    """Return a copy of player_xy with players hidden to follow the `missing` count sequence."""
+def drop_players(player_xy, period, missing, seed, pitch=None):
+    """Return a copy of player_xy with players hidden to follow the `missing` count sequence.
+
+    With `pitch`, new drop-outs are chosen with BAR-ATH's edge weights instead of uniformly.
+    """
     xy = np.asarray(player_xy, dtype=np.float32).copy()
     missing = np.asarray(missing, int)
     rng = np.random.RandomState(seed)
@@ -42,7 +56,11 @@ def drop_players(player_xy, period, missing, seed):
             candidates = np.setdiff1d(visible, dropped)
             extra = min(target - len(dropped), len(candidates))
             if extra > 0:
-                dropped.extend(rng.choice(candidates, extra, replace=False).tolist())
+                weights = None
+                if pitch is not None:
+                    w = edge_weights(xy[t, candidates], pitch)
+                    weights = w / w.sum()
+                dropped.extend(rng.choice(candidates, extra, replace=False, p=weights).tolist())
             if dropped:
                 xy[t, dropped] = np.nan
     return xy
