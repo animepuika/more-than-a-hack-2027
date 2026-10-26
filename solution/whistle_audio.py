@@ -56,6 +56,66 @@ def detect_whistles(peak_db, level_db):
     return [(int(a), int(b)) for a, b in runs(merged) if MIN_S * FPS <= (b - a) <= MAX_S * FPS]
 
 
+# Detector v2: the referee's whistle is a pair of steady tones (a high tone near 4.3 kHz and a
+# second tone about 10% lower), measured on the kick-off whistles (automatic kick-off tags) only.
+# Crowd whistling is a single tone. The broadcast's two channels are identical, so the sound is
+# treated as mono. All settings below were fixed before any check was run.
+HIGH_HZ = (4100.0, 4450.0)
+RATIO = (1.08, 1.14)
+TONE_DB = 18.0
+REF_BAND_HZ = (1500.0, 11500.0)
+V2_WINDOW = 2048
+V2_MIN_S, V2_MAX_S = 0.2, 3.0
+# v3: keep an event only if its strongest moment reaches STRONG_DB. The clear kick-off whistles
+# peaked at 34.9-46.3 dB; 30 dB leaves a 5 dB margin for whistles further from the microphones.
+STRONG_DB = 30.0
+
+
+def tone_pair_strength(wav_path):
+    """Per-video-frame strength (dB above the band median) of the high tone and of its lower partner."""
+    rate, audio = wavfile.read(wav_path, mmap=True)
+    if audio.ndim == 2:
+        audio = audio[:, 0]
+    hop = rate // FPS
+    n = len(audio) // hop
+    freqs = np.fft.rfftfreq(V2_WINDOW, 1 / rate)
+    ref = (freqs >= REF_BAND_HZ[0]) & (freqs <= REF_BAND_HZ[1])
+    high = np.flatnonzero((freqs >= HIGH_HZ[0]) & (freqs <= HIGH_HZ[1]))
+    window = np.hanning(V2_WINDOW).astype(np.float32)
+    high_db = np.zeros(n, np.float32)
+    low_db = np.zeros(n, np.float32)
+    chunk = 10000
+    for start in range(0, n, chunk):
+        idx = np.arange(start, min(n, start + chunk))
+        offsets = np.minimum(idx[:, None] * hop + np.arange(V2_WINDOW)[None], len(audio) - 1)
+        power = np.abs(np.fft.rfft(audio[offsets].astype(np.float32) / 32768.0 * window, axis=1)) ** 2 + 1e-12
+        floor = np.median(power[:, ref], axis=1)
+        best = high[power[:, high].argmax(axis=1)]
+        high_db[idx] = 10 * np.log10(power[np.arange(len(idx)), best] / floor)
+        # Strongest bin in the partner range below each frame's high tone.
+        lo_edge = np.searchsorted(freqs, freqs[best] / RATIO[1])
+        hi_edge = np.searchsorted(freqs, freqs[best] / RATIO[0], side='right')
+        width = int((hi_edge - lo_edge).max())
+        cols = np.minimum(lo_edge[:, None] + np.arange(width)[None], len(freqs) - 1)
+        inside = cols < hi_edge[:, None]
+        partner = np.where(inside, power[np.arange(len(idx))[:, None], cols], 0).max(axis=1)
+        low_db[idx] = 10 * np.log10(partner / floor + 1e-12)
+    return high_db, low_db
+
+
+def detect_referee_whistles(high_db, low_db, strong_db=None):
+    """Return [(first_frame, last_frame_exclusive)] where both whistle tones are present; with
+    strong_db, only events whose strongest frame has both tones at least that loud."""
+    candidate = (high_db >= TONE_DB) & (low_db >= TONE_DB)
+    merged = candidate.copy()
+    for a, b in runs(~candidate):
+        if 0 < a and b < len(candidate) and (b - a) < MERGE_S * FPS:
+            merged[a:b] = True
+    pair = np.minimum(high_db, low_db)
+    return [(int(a), int(b)) for a, b in runs(merged) if V2_MIN_S * FPS <= (b - a) <= V2_MAX_S * FPS
+            and (strong_db is None or pair[a:b].max() >= strong_db)]
+
+
 def to_tactical(frames, mapping, offsets=(4014, 26920)):
     """Map broadcast frames to tactical frames: the measured per-frame mapping where available,
     otherwise the half's constant offset (chosen by the nearest aligned broadcast frame)."""

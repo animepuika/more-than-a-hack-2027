@@ -560,3 +560,11 @@ Results: `results/first_trial_v14_v15.json`.
 **Whistle, first attempt** (`whistle_audio.py`, `run_whistle.py`). The official broadcast video has a stereo sound track that maps onto tactical frames with the broadcast alignment. A simple tone detector finds about 27 events per minute, mostly not the referee: players' speed hardly changes after them. Next: separate the stereo channels and learn the whistle's sound from tracking-detected stoppage starts. Commentary is not used.
 
 **Open question.** Calm possession training wins on SkillCorner and on BAR-ATH's answer-free checks, but scores lower on the 17 public spells (0.546 → 0.516 → 0.476, each step within noise). Results: `results/first_trial_v16_v19.json`.
+
+## Whistle, second attempt: tested, not used
+
+Extract the sound once with `ffmpeg -i data/broadcast/BAR-ATH_broadcast.mp4 -vn -ac 2 -ar 24000 -c:a pcm_s16le data/broadcast/BAR-ATH_broadcast_audio_24k_stereo.wav`, then run `python -m solution.run_whistle --detector v3` and `python -m solution.run_whistle_deadball`. Outputs go to `data/runs/whistles_v1..v3/`.
+
+**What the sound gives.** The two broadcast channels are identical, so commentary cannot be separated out. Learned only from the automatic kick-off tags, the referee's whistle is a pair of steady tones near 4.3 kHz and about 10% lower (crowd whistling is a single tone). Detector v3 keeps tone pairs as strong as the kick-off whistles: 0.77 per minute of play, and players slow down after them by 0.27 m/s more than at random times.
+
+**Why it is not used.** All checks were fixed before each run. v3 fails two of three (slowdown just under the 0.3 m/s bar; set pieces no more often after a whistle than random times). Against V16 gated's dead-ball starts, 20.7% of whistles have one from 2 s before to 5 s after, against 15.1% for time-shifted whistles (1.4×, below the 2× needed). None of the practice matches has sound, so a whistle could only enter as a hand-set rule. Whistles therefore stay out of every prediction. An unexplained lead: whistles with no V16 dead ball within 10 s show the biggest slowdown (−0.57 m/s).
