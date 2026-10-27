@@ -569,7 +569,7 @@ Extract the sound once with `ffmpeg -i data/broadcast/BAR-ATH_broadcast.mp4 -vn 
 
 **Why it is not used.** All checks were fixed before each run. v3 fails two of three (slowdown just under the 0.3 m/s bar; set pieces no more often after a whistle than random times). Against V16 gated's dead-ball starts, 20.7% of whistles have one from 2 s before to 5 s after, against 15.1% for time-shifted whistles (1.4×, below the 2× needed). None of the practice matches has sound, so a whistle could only enter as a hand-set rule. Whistles therefore stay out of every prediction. An unexplained lead: whistles with no V16 dead ball within 10 s show the biggest slowdown (−0.57 m/s).
 
-## Experiment twenty: dead ball while the broadcast cuts away (recommended candidate)
+## Experiment twenty: dead ball while the broadcast cuts away
 
 TV directors cut to close-ups and replays when play stops. A tactical frame counts as a cutaway when its broadcast frame (constant offset per half, measured from player positions) has no valid homography. Run `python -m solution.run_camera_cutaway` for the check and `python -m solution.run_v20` for V20; outputs go to `data/runs/camera_cutaway/` and `data/runs/twentieth_trial/`.
 
@@ -584,7 +584,7 @@ TV directors cut to close-ups and replays when play stops. A tactical frame coun
 | Set-piece tags with dead ball nearby (at least 44 of 58) | 44 | 45 |
 | Possessions per live minute (at most 7.9) | 6.33 | 6.46 |
 
-Public sanity check: Spell F1 **0.533** vs 0.546 (within noise); dead-ball F1 0.52 vs 0.37 (recall 37% vs 24%, precision 88% vs 83%); macro F1 0.746 vs 0.687. Because the full match has far more dead ball than the public five minutes, **V20 is the recommended candidate** and V16 gated + calibrated is the backup. No practice match has both a broadcast and a main tracking, so V20 has no practice-match score.
+Public sanity check: Spell F1 **0.533** vs 0.546 (within noise); dead-ball F1 0.52 vs 0.37 (recall 37% vs 24%, precision 88% vs 83%); macro F1 0.746 vs 0.687. Because the full match has far more dead ball than the public five minutes, **V20 became the recommended candidate** (since experiment twenty-two, V20 + cleanup), with V16 gated + calibrated as the backup. No practice match has both a broadcast and a main tracking, so V20 has no practice-match score.
 
 ## Experiment twenty-one: throw-in and goal-kick detector (rejected, parked)
 
@@ -602,7 +602,24 @@ Public sanity check: Spell F1 **0.533** vs 0.546 (within noise); dead-ball F1 0.
 
 Each cue alone is 89–95% truly dead on the practice matches; most errors are restarts detected late. **Both versions fail P2 and B2, so neither is used; V20 stays the recommended candidate.** V21b was the second look at BAR-ATH's answer-free checks. Worth revisiting if the ball can be recovered from the tactical video, which would show more balls leaving the pitch.
 
-## Reproducing the submission (V20)
+## Experiment twenty-two: fewer split possessions (recommended candidate: V20 + cleanup)
+
+Spell F1 punishes a possession split in two, and V20 changes possession 6.5 times per live minute against 4.2 in the public answers. `split_cleanup.py` tidies the final labels with three rules: a live stretch shorter than *G* seconds between two dead stretches becomes dead; a dead stretch shorter than *S* seconds inside one team's possession is removed; and a possession shorter than *F* seconds between the other team (or before a stoppage) goes back to the team that had the ball. The challenge says a touch without control is not a change of possession.
+
+**Picking the lengths** (`run_split_tuning.py`, rules fixed before the run). The cleanup is applied to V16 gated + calibrated on the practice copies saved by `run_bench10.py --save-tuning`. For truth, Metrica labels are used as they are, and DFL labels have opposing touches under 1 s relabelled, following the challenge's definition. Grid: *F* 0–4 s, *S* 0–3 s, *G* 0/2/4 s. The lengths are picked on the training-seed copies and judged on separately generated test-seed copies. Chosen: *F* = 1 s, *S* = 3 s, *G* = 4 s. Test copies: Spell F1 0.478 → **0.523** (+0.044, better in 100% of bootstrap draws), false dead on the live reference 1.9%. Both rules pass. *S* and *G* are the largest values tried. Part of the flip rule's gain is by construction, because the DFL truth uses the same 1 s idea; without flips the gain is +0.030.
+
+**On BAR-ATH** (`run_v22.py`, answer-free rules against V20, all passed):
+
+| Candidate | False dead | Clear-control agreement | Gap ends | Possessions per live minute | Public Spell F1 |
+|---|---|---|---|---|---|
+| V20 | 3.8% | 88.4% | 65.6% | 6.46 | 0.533 |
+| V22a: V17 calm possession + V20 dead ball | 3.8% | 90.7% | 67.2% | 5.83 | 0.503 |
+| **V20 + cleanup** | 3.9% | 87.7% | 67.2% | 5.01 | **0.574** |
+| V22a + cleanup | 3.9% | 90.1% | 68.8% | 4.56 | 0.516 |
+
+**V20 + cleanup is the recommended candidate.** The cleanup was tuned on V20's own possession model, and it adds one step to the verified build. V22a + cleanup is the main alternative: it is better on the answer-free checks but lower on the 17 public possessions, which is the same calm-versus-public conflict as V17 and is within noise.
+
+## Reproducing the submission (V20 + cleanup)
 
 One command rebuilds the submitted file from the provided data and the public practice data:
 
@@ -610,6 +627,8 @@ One command rebuilds the submitted file from the provided data and the public pr
 python -m solution.make_submission --out data/submission
 ```
 
-It needs the BAR-ATH bundle (see `games.py` / `MTAH_DATA_DIR`), the Metrica sample data in `data/external/metrica-sample-data/` and the DFL open data in `data/external/dfl-open/` (download instructions above). It retrains every model V20 uses with the same settings and seeds: V2/V7 features and control, the V12 and V10 possession models on Metrica, the V16 dead-ball model on Metrica + DFL with the 21-player gate and 2% answer-free calibration, and the broadcast cutaways. It then writes `data/submission/Letinsh.csv` and checks it with the official format validator. The public answers are never read. Runtime is about 30–60 minutes on a laptop.
+It needs the BAR-ATH bundle (see `games.py` / `MTAH_DATA_DIR`), the Metrica sample data in `data/external/metrica-sample-data/` and the DFL open data in `data/external/dfl-open/` (download instructions above). It retrains every model the submission uses, with the same settings and seeds: V2/V7 features and control; the V12 and V10 possession models on Metrica; and the V16 dead-ball model on Metrica + DFL, with the 21-player gate and the 2% answer-free calibration. It then adds the broadcast cutaways and the anti-split cleanup, writes `data/submission/Letinsh.csv`, and checks it with the official format validator. The public answers are never read. Runtime is about 30–60 minutes on a laptop.
 
-`--check` also compares every stage with the frozen experiment outputs in `data/runs/`. On 27 October 2026, every stage matched exactly (labels and model probabilities). The final file was byte-identical to the V20 prediction (sha256 `5f894c9d91c64cc30a745744111d4fb55b4d9c816fa78bcfd30c9f550217577e`), and the official validator accepted it.
+`--check` also compares every stage with the frozen experiment outputs in `data/runs/`.
+
+On 27 October 2026, every stage matched the frozen outputs exactly (labels and model probabilities). The final file was byte-identical to the V20 + cleanup prediction (sha256 `1e6a3e595cda806d38f67311018cbe60c8eea9a22bf9d1d0d061a4631800c150`), and the official validator accepted it.

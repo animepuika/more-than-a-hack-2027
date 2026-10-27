@@ -1,4 +1,4 @@
-"""Rebuild the submission (V20) from the provided data and the public practice data, in one command.
+"""Rebuild the submission (V20 + cleanup) from the provided data and the public practice data, in one command.
 
     python -m solution.make_submission --out data/submission
 
@@ -11,6 +11,9 @@ Stages, each with the same functions and settings as the experiment that introdu
   5. V16 dead-ball model on Metrica + DFL, trusted only where 21+ players are tracked, with the 2%
      answer-free calibration (run_v16.py; the gate as in run_v19.py).
   6. V20: V16 gated plus dead ball while the broadcast cuts away (run_v20.py).
+  7. Anti-split cleanup with the lengths picked on practice copies (split_cleanup.py, run_split_tuning.py):
+     flips under 1 s go back, dead pieces under 3 s inside one team's possession go, and dead
+     stretches less than 4 s apart are joined (run_v22.py, v20_clean).
 Inputs: the BAR-ATH bundle (games.py / MTAH_DATA_DIR), the Metrica sample data and the DFL open data
 (see solution/README.md). The public answers are never read. With --check, every stage is compared
 with the frozen experiment outputs under data/runs.
@@ -28,6 +31,7 @@ from .run import ROOT, DEFAULT_CONFIG, read_config, sha256, write_labels
 
 FEATURE_COLUMNS = ['ball_seen', 'ball_reliable', 'ball_speed_mps', 'players_observed', 'speed_median_mps']
 GATE_PLAYERS, CALIBRATION, MOVING_BALL_MPS = 21, 0.02, 2.0
+CLEANUP = {'flip_s': 1.0, 'short_dead_s': 3.0, 'dead_gap_s': 4.0}  # chosen in data/runs/split_tuning
 FROZEN = {  # experiment outputs this build must reproduce, for --check
     'v2_shape_motion': 'seventh_trial/predictions/v2_shape_motion.csv',
     'v7_transfer': 'seventh_trial/predictions/v7_transfer.csv',
@@ -35,6 +39,7 @@ FROZEN = {  # experiment outputs this build must reproduce, for --check
     'v13_combined': 'thirteenth_trial/predictions/v13_combined.csv',
     'v16_gated_cal': 'sixteenth_trial_gated/predictions/v16_gated_cal.csv',
     'v20_cutaway': 'twentieth_trial/predictions/v20_cutaway.csv',
+    'v20_clean': 'twentysecond_trial/predictions/v20_clean.csv',
 }
 FROZEN_ARRAYS = {'v12_p_home': 'twelfth_trial/v12_p_home.npy', 'v10_p_home': 'tenth_trial/v10_p_home.npy',
                  'v16_p_dead': 'sixteenth_trial/v16_p_dead.npy'}
@@ -159,6 +164,7 @@ def main(argv=None):
     from .run_v6 import _period_keys
     from .run_v13 import combine
     from .run_v14 import overlay
+    from .split_cleanup import tidy
     from .v8_stoppages import build_evidence
     quality = json.loads((ROOT/'solution/config_v7.json').read_text())
     v8config = json.loads((ROOT/'solution/config_v8.json').read_text())
@@ -195,14 +201,17 @@ def main(argv=None):
     extra = cutaway_dead(cut, diag.speed_median_mps.to_numpy(), fps)
     labels['v20_cutaway'] = overlay(labels['v16_gated_cal'], extra, active)
 
+    progress('Stage 7: anti-split cleanup.')
+    labels['v20_clean'] = tidy(labels['v20_cutaway'], period, fps, **CLEANUP)
+
     final = out/f'{args.name}.csv'
-    write_labels(final, labels['v20_cutaway'])
+    write_labels(final, labels['v20_clean'])
     from evaluation.possession_metrics import read_label_csv, validate_submission
     error = validate_submission(read_label_csv(final), n)
     if error:
         raise ValueError(f'Submission invalid: {error}')
-    manifest = {'submission': final.name, 'sha256': sha256(final), 'method': 'V20',
-                'label_counts': {k: int(v) for k, v in zip(*np.unique(labels['v20_cutaway'], return_counts=True))},
+    manifest = {'submission': final.name, 'sha256': sha256(final), 'method': 'V20 + cleanup', 'cleanup': CLEANUP,
+                'label_counts': {k: int(v) for k, v in zip(*np.unique(labels['v20_clean'], return_counts=True))},
                 'inputs_sha256': {k: sha256(paths[k]) for k in ['atd_meta', 'atd_raw']} |
                                  {'broadcast_homography': sha256(asset_paths(source='broadcast')['homography'])},
                 'source_sha256': {q.relative_to(ROOT).as_posix(): sha256(q) for q in sorted((ROOT/'solution').glob('*.py'))},
@@ -215,7 +224,7 @@ def main(argv=None):
         for name, value in arrays.items():
             path = runs/FROZEN_ARRAYS[name]
             checks[name] = {'max_abs_difference': float(np.max(np.abs(np.load(path) - value)))} if path.exists() else {}
-        frozen_final = runs/FROZEN['v20_cutaway']
+        frozen_final = runs/FROZEN['v20_clean']
         checks['final_file_identical'] = frozen_final.exists() and sha256(frozen_final) == manifest['sha256']
         manifest['checks'] = checks
         progress(json.dumps(checks, indent=2))
