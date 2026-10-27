@@ -601,3 +601,15 @@ Public sanity check: Spell F1 **0.533** vs 0.546 (within noise); dead-ball F1 0.
 | B4 possessions per live minute | at most 7.9 | 6.24 | 6.29 |
 
 Each cue alone is 89–95% truly dead on the practice matches; most errors are restarts detected late. **Both versions fail P2 and B2, so neither is used; V20 stays the recommended candidate.** V21b was the second look at BAR-ATH's answer-free checks. Worth revisiting if the ball can be recovered from the tactical video, which would show more balls leaving the pitch.
+
+## Reproducing the submission (V20)
+
+One command rebuilds the submitted file from the provided data and the public practice data:
+
+```bash
+python -m solution.make_submission --out data/submission
+```
+
+It needs the BAR-ATH bundle (see `games.py` / `MTAH_DATA_DIR`), the Metrica sample data in `data/external/metrica-sample-data/` and the DFL open data in `data/external/dfl-open/` (download instructions above). It retrains every model V20 uses with the same settings and seeds: V2/V7 features and control, the V12 and V10 possession models on Metrica, the V16 dead-ball model on Metrica + DFL with the 21-player gate and 2% answer-free calibration, and the broadcast cutaways. It then writes `data/submission/Letinsh.csv` and checks it with the official format validator. The public answers are never read. Runtime is about 30–60 minutes on a laptop.
+
+`--check` also compares every stage with the frozen experiment outputs in `data/runs/`. On 27 October 2026, every stage matched exactly (labels and model probabilities). The final file was byte-identical to the V20 prediction (sha256 `5f894c9d91c64cc30a745744111d4fb55b4d9c816fa78bcfd30c9f550217577e`), and the official validator accepted it.
