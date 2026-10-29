@@ -1,0 +1,8 @@
+# Separate CUDA/media environment; keep the scientific benchmark env unchanged.
+--extra-index-url https://download.pytorch.org/whl/cu128
+numpy==2.5.2
+pandas==3.1.0
+opencv-python==5.0.0.93
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+ultralytics==8.4.191

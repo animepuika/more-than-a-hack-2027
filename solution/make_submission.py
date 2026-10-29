@@ -74,7 +74,7 @@ def metrica_sources():
     return matches, [possession_labels(m.events, m.period)[0] for m in matches]
 
 
-def stage_possession(match, features, v2, period, active, quality, lengths, progress):
+def stage_possession(match, features, v2, period, active, quality, lengths, progress, model_path=None):
     from .ball_masking import hide_live_ball
     from .gap_model import ballfree_features, fit as fit_gap, home_probability as gap_probability
     from .run_v12 import SWITCH_COST_S, TRAIN_MASK, TRAIN_SEED
@@ -93,6 +93,14 @@ def stage_possession(match, features, v2, period, active, quality, lengths, prog
             built, _ = build_features(masked, quality)
             parts.append(training_rows(touch_features(built, ball, m.period, ballfree), lab))
     turnover = fit(parts)
+    if model_path is not None:
+        import joblib
+        model_path = Path(model_path)
+        model_path.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump({'turn': turnover}, model_path)
+        metadata = {'sha256': sha256(model_path), 'training_matches': [m.name for m in matches],
+                    'method': 'Frozen V12 turnover model; no target-match training'}
+        (model_path.parent/'model.json').write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
     progress('  V10 gap model on Metrica.')
     gap = fit_gap(tables, labels)
     del matches, parts, tables
@@ -148,6 +156,8 @@ def main(argv=None):
     parser.add_argument('--out', type=Path, default=ROOT/'data/submission')
     parser.add_argument('--name', default='Letinsh', help='Team name; the file is <name>.csv')
     parser.add_argument('--check', action='store_true', help='Compare every stage with the frozen runs in data/runs')
+    parser.add_argument('--save-video-inputs', action='store_true',
+                        help='Also save the fitted turnover model and frozen stage inputs under out/video_inputs/')
     args = parser.parse_args(argv)
     out = args.out.resolve()
     if not out.is_relative_to((ROOT/'data').resolve()) or (out.exists() and any(out.iterdir())):
@@ -183,7 +193,8 @@ def main(argv=None):
 
     progress('Stages 2-4: V12, V10 and V13 possession.')
     labels['v12_turnover'], p12, p10 = stage_possession(match, features, labels['v2_shape_motion'], period, active,
-                                                        quality, lengths, progress)
+                                                        quality, lengths, progress,
+                                                        model_path=out/'video_inputs/turnover.joblib' if args.save_video_inputs else None)
     evidence = build_evidence(match, v8config, quality)
     labels['v13_combined'] = combine(labels['v12_turnover'], p10, evidence, period, quality, fps)
 
@@ -210,6 +221,15 @@ def main(argv=None):
     error = validate_submission(read_label_csv(final), n)
     if error:
         raise ValueError(f'Submission invalid: {error}')
+    if args.save_video_inputs:
+        video_inputs = out/'video_inputs'
+        video_inputs.mkdir(exist_ok=True)
+        np.save(video_inputs/'p12.npy', p12)
+        np.save(video_inputs/'p10.npy', p10)
+        for filename, name in [('v2', 'v2_shape_motion'), ('v12', 'v12_turnover'),
+                               ('v13', 'v13_combined'), ('cutaway', 'v20_cutaway'),
+                               ('incumbent', 'v20_clean')]:
+            write_labels(video_inputs/(filename+'.csv'), labels[name])
     manifest = {'submission': final.name, 'sha256': sha256(final), 'method': 'V20 + cleanup', 'cleanup': CLEANUP,
                 'label_counts': {k: int(v) for k, v in zip(*np.unique(labels['v20_clean'], return_counts=True))},
                 'inputs_sha256': {k: sha256(paths[k]) for k in ['atd_meta', 'atd_raw']} |

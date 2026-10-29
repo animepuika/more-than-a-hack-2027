@@ -1,5 +1,38 @@
 # FirstTrial: repeatable possession experiments
 
+**Latest experimental public result (29 October 2026): video recovery raises Spell F1 from 0.574359 to 0.595122 (+0.020763).** A ball-specific detector plus seeded identity tracking added 1,307 candidate ball coordinates, including 41 in the public window; 334 ownership labels changed across the match. Original observations and final dead-ball/X masks are preserved, with no retraining. Baseline reproduction is byte-for-byte exact. This is one frozen public five-minute evaluation, not a measured whole-match gain. The original submission remains unchanged. Local report and candidate are under `data/research/yolo_ball_v3/RECOVERY_BENCHMARK_REPORT.md` and `benchmark/predictions.csv`. Earlier pilot failures below remain recorded.
+
+## Experimental video recovery
+
+This is a separate candidate, not a replacement for the default submission. A ball-only detector searches a native 640-pixel crop around the predicted ball position. Identity association compensates camera movement, permits stationary balls, and emits actual detection boxes or abstentions. After 11 consecutive misses it requires a new supplied observation. The first experiment attempts at most 24 frames per missing-ball gap; most long gaps remain unresolved. Predictions/interpolated positions are never exported as recovered observations.
+
+The frozen integration test keeps the model, player inputs, decoder, cleanup settings, and final incumbent D/X masks fixed. Baseline probabilities must match exactly within 1e-6 and baseline labels/CSV must reproduce exactly before new predictions are exported. The earlier detector/identity diagnostic gates failed; the user then requested this separate experimental integration, whose rules were written before its one public evaluation. A public gain of at least 0.01 is a sample lead only. Do not tune on the 17 public possessions.
+
+From a clean checkout, first build the existing baseline with its usual supplied match data and public Metrica/DFL inputs. The optional export flag leaves default submission behavior unchanged:
+
+```powershell
+.venv/Scripts/python.exe -m solution.make_submission --out data/video_baseline --save-video-inputs
+.venv/Scripts/python.exe -m solution.video_recovery.prepare --baseline-build data/video_baseline
+```
+
+If the older local V12/V20/V27 checkpoints already exist, `prepare --from-existing-runs` imports them instead. Use a fresh output folder; never overwrite the frozen candidate. `MTAH_VIDEO_RECOVERY_OUT` can select another directory under ignored `data/`.
+
+Use a separate Python 3.13 CUDA environment for inference, with `requirements-video.txt`; the scientific benchmark environment uses the existing `requirements-v6.txt`. The measured hardware is an RTX 4060 Laptop GPU with 8 GB. Match assets normally live under `data/tactical`; set `MTAH_TACTICAL_VIDEO` if the MP4 is stored elsewhere.
+
+```powershell
+data/tools/media_env/Scripts/python.exe -m solution.video_recovery.fetch
+data/tools/media_env/Scripts/python.exe -m solution.video_recovery.recover
+.venv/Scripts/python.exe -m solution.video_recovery.benchmark
+```
+
+Outputs and resumable per-gap checkpoints stay under `data/runs/video_recovery/`. Freeze the candidate hash before a single evaluation with the official evaluator; avoid rescoring changed settings against the public slice:
+
+```powershell
+.venv/Scripts/python.exe evaluation/run_evaluation.py --results data/runs/video_recovery/benchmark --gt public --out data/runs/video_recovery/public_score
+```
+
+Aggregate measured results and hashes are in `results/video_recovery.json`. The model download is pinned by SHA256. Source: [Roboflow sports setup](https://github.com/roboflow/sports/blob/main/examples/soccer/setup.sh); the actual checkpoint metadata says YOLOv8x, 25 July 2024, 50 epochs, image size 1280 and an AGPL-3.0 notice. The [named dataset version](https://universe.roboflow.com/roboflow-jvuqo/football-ball-detection-rejhg/dataset/2) lists CC BY 4.0. Exact binary-to-training-run linkage is not independently established; preserve these provenance limits and notices. No upstream tutorial implementation was copied. Do not commit model weights, videos, coordinates, predictions, or local Notion/report copies.
+
 This folder keeps our experiments together, from the first nearest-player baseline through team shape, stoppage clues, physics, HMM smoothing, abstention, and external-sample training. The highest observed **custom-method** Spell F1 on the public five minutes remains **0.4118**, reached by V7 confirmed control and tied by V8's ball-based variants. The supplied **smooth125 baseline scores 0.4242 on this same public sample**, although the official full-match results favor smooth50 over smooth125. V8 adds nine correct dead-ball frames and one false dead-ball frame, raising frame accuracy from 70.80% to 70.91%, but does not improve Spell F1. The reused sample has only 17 possession spells; it cannot establish a full-match winner. V9 therefore selects methods on a larger external bench (1,145 possession spells from three Metrica matches, with the ball hidden during live play to resemble BAR-ATH); see the V9 section. See the V7/V8 sections below for comparisons and limitations. Earlier sections record the experiments as they stood at the time.
 
 ## Run it
