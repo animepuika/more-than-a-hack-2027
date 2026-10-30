@@ -1,6 +1,62 @@
 # FirstTrial: repeatable possession experiments
 
-**Latest experimental public result (29 October 2026): video recovery raises Spell F1 from 0.574359 to 0.595122 (+0.020763).** A ball-specific detector plus seeded identity tracking added 1,307 candidate ball coordinates, including 41 in the public window; 334 ownership labels changed across the match. Original observations and final dead-ball/X masks are preserved, with no retraining. Baseline reproduction is byte-for-byte exact. This is one frozen public five-minute evaluation, not a measured whole-match gain. The original submission remains unchanged. Local report and candidate are under `data/research/yolo_ball_v3/RECOVERY_BENCHMARK_REPORT.md` and `benchmark/predictions.csv`. Earlier pilot failures below remain recorded.
+**Best measured experimental public result (29 October 2026): video recovery raises Spell F1 from 0.574359 to 0.595122 (+0.020763).** A ball-specific detector plus seeded identity tracking added 1,307 candidate ball coordinates, including 41 in the public window; 334 ownership labels changed across the match. Original observations and final dead-ball/X masks are preserved, with no retraining. Baseline reproduction is byte-for-byte exact. This is one frozen public five-minute evaluation, not a measured whole-match gain. The original submission remains unchanged. Local report and candidate are under `data/research/yolo_ball_v3/RECOVERY_BENCHMARK_REPORT.md` and `benchmark/predictions.csv`. Earlier pilot failures below remain recorded.
+
+## Full-match video expansion: tested, not promoted
+
+The 30 October experiment searched both active halves, processing 150 gaps
+(147 with usable endpoint observations). It added 29,215 actual detector-box
+coordinates beyond the earlier short recovery, bringing recovery to 30,522
+coordinates. Original observations, earlier recovery points, model training and
+final D/X masks stayed fixed. Interpolation only positioned search crops; no
+interpolated coordinate was exported.
+
+| Public five-minute comparison | Short recovery | Expanded recovery |
+|---|---:|---:|
+| Spell F1 | **0.595122** | 0.580952 |
+| Macro F1 | 0.789913 | 0.791379 |
+| Predicted possessions (17 true) | 24 | 25 |
+
+**Keep the short-recovery candidate.** More coordinates improved frame labels
+slightly but did not improve possession spells in this reused public sample.
+The hidden whole-match result is unknown. The expanded method does not replace
+the default submission. Aggregate settings, results and output hashes are in
+`results/video_recovery_full_match.json`.
+
+After preparing and rebuilding the short-video candidate with the commands in
+the next section, run the expansion in the GPU environment and its unchanged
+possession benchmark in the scientific environment:
+
+```powershell
+data/tools/media_env/Scripts/python.exe -m solution.video_recovery.full_match
+.venv/Scripts/python.exe -m solution.video_recovery.benchmark --recovery data/runs/video_recovery/full_match/recovery.npz --out data/runs/video_recovery/full_match/benchmark
+```
+
+`full_match --help` documents alternative input/output paths. Outputs must stay
+under ignored `data/`. Existing completed gaps are reused only with matching
+locked inputs and code. The recorded recovery took about 81 minutes on the
+RTX 4060 laptop; the possession rebuild took about 17 minutes. No extra packages
+beyond the existing video/scientific requirements are needed.
+
+The fixed search uses six native 640-pixel tiles every five frames and a
+time-ordered path between supplied observations. It then makes denser searches
+between detected anchors at most ten frames apart. Stationary balls remain
+eligible; ambiguous paths abstain. The source fixes the confidence, physical
+limits and alternative-path margin. Do not select settings using public answers.
+
+Only after predictions are frozen, the optional one-shot comparison is:
+
+```powershell
+.venv/Scripts/python.exe -m solution.video_recovery.expanded_score
+```
+
+This verifies the short candidate's recorded hash, candidate build checks and
+input hashes before invoking the official scorer. It refuses a nonempty score
+folder. A public sample lead required Spell F1 gain at least 0.01 and macro F1
+decline no worse than 0.01; the recorded expansion did not pass. Box provenance
+is not independent proof of detection correctness. Keep match data, weights,
+coordinates, predictions and local interactive reports out of Git.
+
 
 ## Experimental video recovery
 

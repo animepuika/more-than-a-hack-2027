@@ -1,0 +1,85 @@
+{
+  "recorded_date": "2026-10-30",
+  "experiment": "expanded full-match video recovery",
+  "decision": "not_promoted",
+  "hidden_whole_match_score_known": false,
+  "public_sample_true_possessions": 17,
+  "public": {
+    "baseline_public_spell_f1": 0.595122,
+    "expanded_public_spell_f1": 0.580952,
+    "gain": -0.014170000000000016,
+    "baseline_macro_f1": 0.789913,
+    "expanded_macro_f1": 0.791379,
+    "public_sample_lead": false
+  },
+  "public_accuracy": {
+    "baseline_video": 0.8364,
+    "expanded_video": 0.839067
+  },
+  "public_predicted_possessions": {
+    "baseline_video": 24,
+    "expanded_video": 25
+  },
+  "recovery": {
+    "additional_coordinates": 29215,
+    "total_recovered_coordinates": 30522,
+    "original_missing": 85831,
+    "active_missing": 64643,
+    "new_by_half": {
+      "1": 14196,
+      "2": 15019
+    },
+    "speed_screen_dropped": 32,
+    "sampled_frames": 12877,
+    "dense_frames": 30794,
+    "observations_and_short_recovery_preserved": true
+  },
+  "active_gaps": 150,
+  "eligible_gaps": 147,
+  "ownership_changes_vs_short_baseline": 5156,
+  "ownership_changes_vs_original": 5448,
+  "cleanup_fallback_frames": 378,
+  "hashes": {
+    "model_sha256": "678fbad05134f19c5094cb8d273812ec9c6691228180d46832551ecf99ed2912",
+    "short_prediction_sha256": "d2048553ec2ad4538369a5f786c24531d2d95439c0bf6f3a9102bf1a0aa240f5",
+    "expanded_prediction_sha256": "64cb85ad6e3eebb17d47e6799b216f3385b623c0cd93f2f4ecd005b1be9d9073",
+    "recovery_sha256": "539b5a2095ff35946e743c2f3830cea0ee4516b18ece554ab518577b1cbe4918",
+    "research_protocol_sha256": "038c89824f16735f14991d8540f853d8a8928da5987b6f38fffb0842ec414e8e"
+  },
+  "integrity": {
+    "model_refit": false,
+    "dead_mask_changed": false,
+    "x_mask_changed": false,
+    "original_p12_max_abs_difference": 0.0,
+    "source_hashes_stable": true,
+    "exported_interpolated_coordinates": 0,
+    "all_added_points_have_actual_boxes": true
+  },
+  "fixed_rules": {
+    "sample_stride_frames": 5,
+    "tiles_native_pixels": 640,
+    "microbatch_max": 12,
+    "detector_confidence": 0.1,
+    "detector_iou": 0.5,
+    "association_top_boxes": 8,
+    "local_edge_horizon_frames": 25,
+    "projected_speed_max_mps": 70,
+    "projected_edge_jitter_m": 2,
+    "pitch_margin_m": 3,
+    "skipped_sample_cost": 2,
+    "motion_cost_scale": 0.25,
+    "motion_speed_scale_mps": 20,
+    "association_margin": 0.5,
+    "dense_anchor_separation_max_frames": 10,
+    "dense_hint_gate_px": 25,
+    "minimum_additional_coordinates_before_scoring": 500,
+    "public_spell_gain_minimum": 0.01,
+    "public_macro_decline_maximum": 0.01
+  },
+  "limitations": [
+    "Public scores cover five reused minutes, not the hidden full match.",
+    "Actual detector boxes are not independently verified ball labels.",
+    "A ground-plane homography cannot recover an airborne ball height.",
+    "The expanded variant is not the default submission."
+  ]
+}
