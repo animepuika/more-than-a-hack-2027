@@ -136,6 +136,13 @@ def dead_probability(model, table):
     return model.predict_proba(table)[:, 1]
 
 
+def fixed_dead_mask(p_dead, period, config, threshold, fps=25, gap=0.3):
+    """Dead mask at a given start threshold (continue threshold `gap` lower), as calibrated_dead_mask builds it."""
+    from .v7_model import dead_mask
+    settings = {**config, 'dead_start_score': threshold, 'dead_continue_score': max(0.05, threshold - gap)}
+    return dead_mask(p_dead, np.asarray(period), settings, fps) & (np.asarray(period) > 0)
+
+
 def calibrated_dead_mask(p_dead, period, config, live_reference, max_false_rate, fps=25, gap=0.3):
     """Raise the start threshold until at most `max_false_rate` of certainly-live frames are D.
 

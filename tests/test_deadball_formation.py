@@ -75,6 +75,13 @@ class CalibrationTests(unittest.TestCase):
                                                np.ones(100, bool)], 0.02)
         self.assertEqual(threshold, 0.5)
 
+    def test_fixed_threshold_matches_the_calibrated_mask(self):
+        from solution.deadball_formation import calibrated_dead_mask, fixed_dead_mask
+        p = np.r_[np.full(100, 0.97), np.full(50, 0.1), np.full(100, 0.8), np.full(50, 0.1)]
+        live = np.r_[np.zeros(100, bool), np.ones(200, bool)]
+        mask, threshold = calibrated_dead_mask(p, np.ones(300, int), self.CONFIG, live, 0.02)
+        np.testing.assert_array_equal(fixed_dead_mask(p, np.ones(300, int), self.CONFIG, threshold), mask)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -2,6 +2,28 @@
 
 Every experiment in the order we ran it, kept as written at the time. Numbers and "current"/"best" labels describe that moment, not today. For the current submission, how to rebuild it and a results summary, see [README.md](README.md).
 
+## V33: rebuild under the organisers' rule clarification (3 November 2026)
+
+The organisers clarified that every trained or tuned setting must come from external data, never from the provided game. It also bans training on the provided video, checking output against the video, and uploading the provided data to AI services. Three settings of V20 + cleanup had been measured on BAR-ATH's own tracking. None of them used the answers, but they were still set from the provided game. V33 replaces them (`external_settings.py`, `config_external.json`, `make_submission.py`). The plan and bug checks were written before the rebuild. V33 is adopted because the rules require it, not because of its score.
+
+- **Ball-gap lengths for the training copies:** taken from SkillCorner's 20 open matches (2,368 gaps, median 1.5 s), not BAR-ATH.
+- **V16 dead-ball model:** trained on the 10 practice matches as recorded, without BAR-ATH's pattern of missing players. Its inputs never used the ball.
+- **V16 threshold:** fixed on the practice matches instead of calibrated on BAR-ATH. Each match was predicted by a model trained on the other nine, and the threshold was raised until at most 2% of truly live frames with a moving ball were called dead. Result: threshold 0.888, 80% of dead ball found, 93% precision.
+- **V2 team-shape context:** removed. It was fitted on BAR-ATH's tracking each half, so the early dead-ball guess now comes from V1's hand-set rules.
+- **Cutaway trims:** chosen on SkillCorner with a rule fixed beforehand: keep the most dead ball with at most 2% live. It gives 3 s and 6 s, the same values as before, so this setting is unchanged.
+
+**Result.** 11,831 frames change (5.9%), and dead ball rises from 31.6% to 37.8% of the match. Bug checks:
+- Valid file: passes.
+- Dead share between 20% and 55%: passes.
+- 3–9 possessions per live minute (5.5): passes.
+- Clearly live frames called dead: 6.0%, against a limit of 5% (previously 3.9%). **This check fails.**
+
+The investigation found no bug. The rise comes from the formation model outside cutaways, on frames with 21 and with 22 players alike. The threshold fixed on practice matches is simply looser on our match than the old calibration on our match was. It was not adjusted, because that would again tune on the provided game.
+
+The public five minutes were scored once, for information: Spell F1 **0.612** (previously 0.574) and macro F1 0.861. New sha256: `504f10eac5833806f96962139095b51f76eea83769c28a4a531b57e54a1b71b7`. Summary: `results/first_trial_v33.json`.
+
+Not affected, and not used in the submission: the video ball recovery and the two detector retrainings on the tactical video. The retrainings are now against the rules and will not be used.
+
 **Best measured experimental public result (29 October 2026): video recovery raises Spell F1 from 0.574359 to 0.595122 (+0.020763).** A ball-specific detector plus seeded identity tracking added 1,307 candidate ball coordinates, including 41 in the public window; 334 ownership labels changed across the match. Original observations and final dead-ball/X masks are preserved, with no retraining. Baseline reproduction is byte-for-byte exact. This is one frozen public five-minute evaluation, not a measured whole-match gain. The original submission remains unchanged. Local report and candidate are under `data/research/yolo_ball_v3/RECOVERY_BENCHMARK_REPORT.md` and `benchmark/predictions.csv`. Earlier pilot failures below remain recorded.
 
 ## Full-match video expansion: tested, not promoted

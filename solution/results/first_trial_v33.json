@@ -1,0 +1,31 @@
+{
+  "experiment": "V33 - rebuild under the organisers' 1 November 2026 rules: every trained or tuned setting from external data",
+  "protocol": "Written before the rebuild and any score (local data/runs/v33_PROTOCOL.md). Adopted because the rules require it; checks only catch bugs.",
+  "changes": [
+    "V12 training copies: SkillCorner ball-gap lengths instead of BAR-ATH's",
+    "V16 dead-ball model: trained on the 10 practice games as recorded, no BAR-ATH player drop-out pattern",
+    "V16 threshold: fixed on the practice games (leave one game out) instead of calibrated on BAR-ATH",
+    "V2 team-shape context fitted on BAR-ATH tracking: removed (V1 hand-set rules give the early dead mask)",
+    "Cutaway trims: SkillCorner independently gives 3 s / 6 s, unchanged"
+  ],
+  "external_settings": {
+    "skillcorner_ball_gaps": 2368,
+    "skillcorner_median_gap_s": 1.52,
+    "cutaway_trim_start_s": 3.0,
+    "cutaway_trim_end_s": 6.0,
+    "dead_start_threshold": 0.8881689453125,
+    "practice_check": {"false_dead_on_moving_live": 0.0200, "dead_recall": 0.8017, "dead_precision": 0.9310}
+  },
+  "submission_sha256": "504f10eac5833806f96962139095b51f76eea83769c28a4a531b57e54a1b71b7",
+  "frames_changed_vs_v20_clean": 11831,
+  "label_shares_graded": {"previous": {"H": 0.384, "A": 0.300, "D": 0.316}, "v33": {"H": 0.363, "A": 0.258, "D": 0.378}},
+  "bug_checks": {
+    "C1_valid_file": true,
+    "C2_dead_share_20_55pct": {"value": 0.3781, "pass": true},
+    "C3_false_dead_on_clear_live_le_5pct": {"value": 0.0602, "previous": 0.0389, "pass": false},
+    "C4_possessions_per_live_minute_3_9": {"value": 5.53, "pass": true}
+  },
+  "c3_investigation": "Not a bug. The rise is in the V16 region outside cutaways (1.5% -> 3.5% of clear-live frames), on frames with 22 and with 21 players alike: the practice-fixed threshold is looser on BAR-ATH than the old BAR-ATH calibration was. Cutaway dead ball is unchanged (2.2%). Not tuned further, because tuning toward this check would again tune on the provided game.",
+  "public_five_minutes_information_only": {"spell_f1": 0.6118, "macro_f1": 0.8614, "previous_spell_f1": 0.5744},
+  "public_answers_used_for_choices": false
+}
