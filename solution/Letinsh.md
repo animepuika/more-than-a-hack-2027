@@ -108,7 +108,8 @@ The match video and the tactical homography are **not** used by the submission.
 - **False dead ball:** about 6% of clearly live frames are called dead. This comes from the dead-ball threshold, which is fixed on practice matches and not adjusted to this match.
 - **Different practice data:** Metrica's ball vanishes and DFL's ball freezes at stoppages, so the dead-ball model cannot learn from the ball; it uses formations only. Provider labels also define possession slightly differently from this challenge.
 - **The full-match score is unknown.** The public sample is 17 possessions; differences below about 0.04 there are noise.
-- **With more time:** a sequence model trained on all practice matches aimed at short possessions (set up and partly run), better throw-in and goal-kick detection, and more practice matches with broadcast video.
+- **A stronger possession model that did not transfer.** We tested a bidirectional GRU that reads the whole sequence and was trained on all 10 practice matches (V34/V35). On unseen practice matches it raised Spell F1 from 0.566 to 0.638 and won all 10. On this match, however, it failed a check written before the build: on frames where one player clearly controls a moving ball, it agreed with that player's team 85.5% of the time, against 90.6% for the submitted method. The practice copies hide the ball only in short gaps, while this match's tracking often loses it for much longer, which is the likely cause. We kept the submitted method.
+- **With more time:** practice copies with a broad range of ball-gap lengths so the sequence model can be used safely, better throw-in and goal-kick detection, and more practice matches with broadcast video.
 
 ## 7. Reproduction
 

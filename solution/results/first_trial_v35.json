@@ -1,0 +1,27 @@
+{
+  "experiment": "V35 - V34 sequence possession model put into the submission (protocol written before the build: local data/runs/v35_PROTOCOL.md)",
+  "final_model": {"trained_on": "10 practice games, recorded + 25% ball hidden with SkillCorner gaps", "seed": 3211,
+                  "weights": "solution/seq_weights.npz", "switch_cost_s": 1.0,
+                  "numpy_vs_torch_max_abs_difference": 1.7e-06},
+  "submission_sha256": "3ca722d14155f3dd0d633bb3630d4d14c00a8c5a3b93dbdc84cc3091fe06a07e",
+  "frames_changed_vs_v33": 15211,
+  "bug_checks": {
+    "C1_valid_file": true,
+    "C2_dead_share_20_55pct": {"value": 0.3798, "pass": true},
+    "C3_false_dead_on_clear_live_le_5pct": {"value": 0.0610, "v33": 0.0602, "pass": false},
+    "C4_possessions_per_live_minute_3_9": {"value": 4.63, "v33": 5.53, "pass": true},
+    "C5_clear_control_agreement_ge_v33": {"value": 0.8549, "v33": 0.9058, "pass": false}
+  },
+  "c5_investigation": {
+    "not_a_code_bug": "numpy inference matches torch; inputs match training columns",
+    "by_players_tracked": {"22": [0.925, 0.873], "21": [0.856, 0.807], "19-20": [0.909, 0.85], "le_18": [0.942, 0.958]},
+    "practice_same_measure": {"nearest_player_agreement": {"baseline": 0.9555, "v34": 0.9304},
+                              "truth_agreement_on_those_frames": {"baseline": 0.9408, "v34": 0.9508},
+                              "nearest_player_vs_truth": 0.9219},
+    "reading": "Lower agreement with the nearest player is expected from the better model (on practice it agrees less with the proxy but more with the truth). On BAR-ATH the drop is twice as large and the same with 22 players, which fits a difference the practice copies do not cover, most likely much longer ball gaps."
+  },
+  "public_five_minutes_information_only": {"spell_f1": 0.5677, "macro_f1": 0.8400, "predicted_spells": 14, "true_spells": 17,
+                                          "v33_spell_f1": 0.6118, "v33_macro_f1": 0.8614},
+  "decision": "Not adopted automatically: a pre-declared check failed without a bug to fix. The submission stays V33 unless the team decides otherwise. The public score is information only and is not the reason.",
+  "public_answers_used_for_choices": false
+}

@@ -1,0 +1,260 @@
+{
+  "experiment": "V34 sequence possession model, external settings only (practice only)",
+  "conditions": {
+    "test_hidden": {
+      "groups": {
+        "controlled/all": {
+          "baseline": 0.5662718556119571,
+          "v34": 0.6378634024203644,
+          "gain": 0.07159154680840729
+        },
+        "controlled/metrica": {
+          "baseline": 0.5844976076555024,
+          "v34": 0.6714615029967728,
+          "gain": 0.08696389534127036
+        },
+        "controlled/dfl": {
+          "baseline": 0.558656537385046,
+          "v34": 0.6233466135458168,
+          "gain": 0.06469007616077083
+        },
+        "raw/all": {
+          "baseline": 0.5272967265047519,
+          "v34": 0.5963769060341457,
+          "gain": 0.06908017952939383
+        },
+        "raw/metrica": {
+          "baseline": 0.5844976076555024,
+          "v34": 0.6714615029967728,
+          "gain": 0.08696389534127036
+        },
+        "raw/dfl": {
+          "baseline": 0.5055049216186657,
+          "v34": 0.5667877906976744,
+          "gain": 0.061282869079008706
+        }
+      },
+      "per_match": [
+        {
+          "name": "DFL_J03WMX",
+          "kind": "dfl",
+          "switch_cost": 1.0,
+          "baseline": 0.5522510231923603,
+          "v34": 0.6405333333333333
+        },
+        {
+          "name": "DFL_J03WN1",
+          "kind": "dfl",
+          "switch_cost": 1.0,
+          "baseline": 0.5315926892950392,
+          "v34": 0.5367292225201072
+        },
+        {
+          "name": "DFL_J03WOH",
+          "kind": "dfl",
+          "switch_cost": 1.0,
+          "baseline": 0.6034985422740524,
+          "v34": 0.6574374079528719
+        },
+        {
+          "name": "DFL_J03WOY",
+          "kind": "dfl",
+          "switch_cost": 1.0,
+          "baseline": 0.5146596858638743,
+          "v34": 0.6158038147138964
+        },
+        {
+          "name": "DFL_J03WPY",
+          "kind": "dfl",
+          "switch_cost": 0.5,
+          "baseline": 0.5743283582089552,
+          "v34": 0.6539772727272727
+        },
+        {
+          "name": "DFL_J03WQQ",
+          "kind": "dfl",
+          "switch_cost": 1.0,
+          "baseline": 0.5549257759784075,
+          "v34": 0.6254445964432285
+        },
+        {
+          "name": "DFL_J03WR9",
+          "kind": "dfl",
+          "switch_cost": 0.5,
+          "baseline": 0.5906542056074766,
+          "v34": 0.6396449704142012
+        },
+        {
+          "name": "Sample_Game_1",
+          "kind": "metrica",
+          "switch_cost": 1.0,
+          "baseline": 0.5568181818181819,
+          "v34": 0.668515950069348
+        },
+        {
+          "name": "Sample_Game_2",
+          "kind": "metrica",
+          "switch_cost": 1.0,
+          "baseline": 0.5848024316109423,
+          "v34": 0.6672514619883041
+        },
+        {
+          "name": "Sample_Game_3",
+          "kind": "metrica",
+          "switch_cost": 1.0,
+          "baseline": 0.6109890109890109,
+          "v34": 0.6780104712041884
+        }
+      ],
+      "wins": 10,
+      "bootstrap": {
+        "unit": "whole_match",
+        "draws": 2000,
+        "seed": 20271027,
+        "mean": 0.07144318360985974,
+        "interval_90": [
+          0.05637188367362157,
+          0.08583026988518863
+        ],
+        "share_first_better": 1.0
+      },
+      "fixed_switch_cost_diagnostic": {
+        "0.25": 0.636938258434458,
+        "0.5": 0.6399673513807645,
+        "1.0": 0.6409186388461
+      }
+    },
+    "recorded": {
+      "groups": {
+        "controlled/all": {
+          "baseline": 0.598259893348302,
+          "v34": 0.6760990125794671,
+          "gain": 0.07783911923116515
+        },
+        "controlled/metrica": {
+          "baseline": 0.6088867654085046,
+          "v34": 0.6970189701897019,
+          "gain": 0.08813220478119732
+        },
+        "controlled/dfl": {
+          "baseline": 0.593840651698788,
+          "v34": 0.6671558215871789,
+          "gain": 0.07331516988839093
+        },
+        "raw/all": {
+          "baseline": 0.5582128777923785,
+          "v34": 0.6342516186365368,
+          "gain": 0.07603874084415829
+        },
+        "raw/metrica": {
+          "baseline": 0.6088867654085046,
+          "v34": 0.6970189701897019,
+          "gain": 0.08813220478119732
+        },
+        "raw/dfl": {
+          "baseline": 0.5389885807504078,
+          "v34": 0.6097121666960975,
+          "gain": 0.07072358594568973
+        }
+      },
+      "per_match": [
+        {
+          "name": "DFL_J03WMX",
+          "kind": "dfl",
+          "switch_cost": 1.0,
+          "baseline": 0.5761517615176152,
+          "v34": 0.6911458333333333
+        },
+        {
+          "name": "DFL_J03WN1",
+          "kind": "dfl",
+          "switch_cost": 0.5,
+          "baseline": 0.5696498054474708,
+          "v34": 0.5943734015345268
+        },
+        {
+          "name": "DFL_J03WOH",
+          "kind": "dfl",
+          "switch_cost": 0.5,
+          "baseline": 0.6207906295754027,
+          "v34": 0.7015736766809729
+        },
+        {
+          "name": "DFL_J03WOY",
+          "kind": "dfl",
+          "switch_cost": 0.5,
+          "baseline": 0.5647979139504563,
+          "v34": 0.663076923076923
+        },
+        {
+          "name": "DFL_J03WPY",
+          "kind": "dfl",
+          "switch_cost": 0.5,
+          "baseline": 0.6216296296296296,
+          "v34": 0.6910128388017118
+        },
+        {
+          "name": "DFL_J03WQQ",
+          "kind": "dfl",
+          "switch_cost": 0.5,
+          "baseline": 0.5997322623828647,
+          "v34": 0.6680573663624512
+        },
+        {
+          "name": "DFL_J03WR9",
+          "kind": "dfl",
+          "switch_cost": 0.25,
+          "baseline": 0.6128834355828221,
+          "v34": 0.6674486803519061
+        },
+        {
+          "name": "Sample_Game_1",
+          "kind": "metrica",
+          "switch_cost": 0.5,
+          "baseline": 0.5966480446927374,
+          "v34": 0.7032608695652174
+        },
+        {
+          "name": "Sample_Game_2",
+          "kind": "metrica",
+          "switch_cost": 0.25,
+          "baseline": 0.5969325153374233,
+          "v34": 0.6794835007173601
+        },
+        {
+          "name": "Sample_Game_3",
+          "kind": "metrica",
+          "switch_cost": 0.5,
+          "baseline": 0.6317241379310345,
+          "v34": 0.706786171574904
+        }
+      ],
+      "wins": 10,
+      "bootstrap": {
+        "unit": "whole_match",
+        "draws": 2000,
+        "seed": 20271027,
+        "mean": 0.07785550041743289,
+        "interval_90": [
+          0.06467093879797062,
+          0.09069074148836935
+        ],
+        "share_first_better": 1.0
+      },
+      "fixed_switch_cost_diagnostic": {
+        "0.25": 0.6786679149391467,
+        "0.5": 0.6790697674418604,
+        "1.0": 0.6782584657912925
+      }
+    }
+  },
+  "rules": {
+    "P1": true,
+    "P2": true,
+    "P3": true,
+    "P4": true
+  },
+  "pass": true,
+  "public_or_bar_ath_data_used": false,
+  "submission_changed": false
+}

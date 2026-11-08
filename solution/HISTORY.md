@@ -2,6 +2,32 @@
 
 Every experiment in the order we ran it, kept as written at the time. Numbers and "current"/"best" labels describe that moment, not today. For the current submission, how to rebuild it and a results summary, see [README.md](README.md).
 
+## V34 and V35: a sequence model for possession (3 November 2026, tested, not adopted)
+
+**Why.** On the 10 practice matches, 75% of the possessions we miss last under 5 s. Possessions under 2 s are found only 11% of the time, and they are missed even with complete tracking. So the limit is the model, not missing data.
+
+**V34** (`run_v34.py`, `seq_model.py`) replaces the V12/V10/V13 possession steps with a 2-layer bidirectional GRU that reads 40-second windows of the same touch and team-shape inputs. Each practice match is predicted by a model trained on the other nine. The practice copies use external settings only:
+- the ball hidden in 25% of live and dead frames, with SkillCorner gap lengths;
+- no players dropped;
+- the same fixed dead-ball mask for both arms.
+
+The rules were written before any result. An earlier version (V32) was abandoned unscored because its copies used BAR-ATH's gap and drop-out patterns.
+
+**Practice result:** Spell F1 0.566 → **0.638** (+0.072) on the copies with the ball hidden, and 0.598 → 0.676 on the untouched copies. It won all 10 matches, both providers improved, and every bootstrap draw was positive. All rules passed.
+
+**V35** puts it into the submission:
+- final weights trained on all 10 matches (`seq_weights.npz`);
+- numpy inference (`seq_infer.py`), which matches PyTorch to 2e-6;
+- switch cost 1.0 s, the best value on the practice predictions.
+
+**The check failed.** On BAR-ATH frames where one player clearly controls a moving ball, its team agrees with that player 85.5% of the time, against 90.6% for V33. That breaks a rule written before the build.
+- No code bug was found.
+- The drop is the same with all 22 players tracked.
+- On practice the same measure also falls (95.6% → 93.0%) while agreement with the true labels rises (94.1% → 95.1%). On BAR-ATH the fall is twice as large.
+- The likely cause is that BAR-ATH's tracking loses the ball for much longer stretches than the practice copies cover.
+
+The public five minutes, scored once for information, gave 0.568 (V33: 0.612). **Decision: not adopted; V33 stays the submission.** Summaries: `results/first_trial_v34.json`, `results/first_trial_v35.json`.
+
 ## V33: rebuild under the organisers' rule clarification (3 November 2026)
 
 The organisers clarified that every trained or tuned setting must come from external data, never from the provided game. It also bans training on the provided video, checking output against the video, and uploading the provided data to AI services. Three settings of V20 + cleanup had been measured on BAR-ATH's own tracking. None of them used the answers, but they were still set from the provided game. V33 replaces them (`external_settings.py`, `config_external.json`, `make_submission.py`). The plan and bug checks were written before the rebuild. V33 is adopted because the rules require it, not because of its score.
