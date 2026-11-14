@@ -1,0 +1,265 @@
+{
+  "experiment": "V36 sequence model with broad generic ball gaps (practice only)",
+  "conditions": {
+    "test_broad25": {
+      "groups": {
+        "controlled/all": {
+          "baseline": 0.5617583680505674,
+          "v36": 0.6419986495611074,
+          "gain": 0.08024028151053997
+        },
+        "controlled/metrica": {
+          "baseline": 0.5876021143680922,
+          "v36": 0.6711372904395108,
+          "gain": 0.08353517607141858
+        },
+        "controlled/dfl": {
+          "baseline": 0.5507377049180328,
+          "v36": 0.6296267795305887,
+          "gain": 0.0788890746125559
+        },
+        "raw/all": {
+          "baseline": 0.5219073203492277,
+          "v36": 0.6034224870072252,
+          "gain": 0.08151516665799752
+        },
+        "raw/metrica": {
+          "baseline": 0.5876021143680922,
+          "v36": 0.6711372904395108,
+          "gain": 0.08353517607141858
+        },
+        "raw/dfl": {
+          "baseline": 0.4964205816554809,
+          "v36": 0.5771207321365716,
+          "gain": 0.08070015048109064
+        }
+      },
+      "per_match": [
+        {
+          "name": "DFL_J03WMX",
+          "switch_cost": 0.5,
+          "baseline": 0.5277310924369748,
+          "v36": 0.6346805736636245
+        },
+        {
+          "name": "DFL_J03WN1",
+          "switch_cost": 0.5,
+          "baseline": 0.5194666666666667,
+          "v36": 0.5822277847309136
+        },
+        {
+          "name": "DFL_J03WOH",
+          "switch_cost": 0.5,
+          "baseline": 0.5812121212121213,
+          "v36": 0.658625525946704
+        },
+        {
+          "name": "DFL_J03WOY",
+          "switch_cost": 0.5,
+          "baseline": 0.5338624338624338,
+          "v36": 0.6076530612244898
+        },
+        {
+          "name": "DFL_J03WPY",
+          "switch_cost": 0.5,
+          "baseline": 0.5791855203619909,
+          "v36": 0.6783592644978783
+        },
+        {
+          "name": "DFL_J03WQQ",
+          "switch_cost": 0.5,
+          "baseline": 0.5638888888888889,
+          "v36": 0.6261753494282084
+        },
+        {
+          "name": "DFL_J03WR9",
+          "switch_cost": 0.5,
+          "baseline": 0.5575364667747164,
+          "v36": 0.6277691107644305
+        },
+        {
+          "name": "Sample_Game_1",
+          "switch_cost": 0.5,
+          "baseline": 0.5790960451977402,
+          "v36": 0.6637837837837838
+        },
+        {
+          "name": "Sample_Game_2",
+          "switch_cost": 0.5,
+          "baseline": 0.5678407350689129,
+          "v36": 0.6610709117221419
+        },
+        {
+          "name": "Sample_Game_3",
+          "switch_cost": 0.5,
+          "baseline": 0.6138888888888888,
+          "v36": 0.6871134020618557
+        }
+      ],
+      "wins": 10,
+      "bootstrap": {
+        "unit": "whole_match",
+        "draws": 2000,
+        "seed": 20271027,
+        "mean": 0.08031504062343789,
+        "interval_90": [
+          0.07282479445635492,
+          0.0882822113848251
+        ],
+        "share_first_better": 1.0
+      },
+      "fixed_switch_cost_diagnostic": {
+        "0.25": 0.6404556894952974,
+        "0.5": 0.6419986495611074,
+        "1.0": 0.6406211007902398
+      }
+    },
+    "recorded": {
+      "groups": {
+        "controlled/all": {
+          "baseline": 0.598259893348302,
+          "v36": 0.6809453865669648,
+          "gain": 0.08268549321866281
+        },
+        "controlled/metrica": {
+          "baseline": 0.6088867654085046,
+          "v36": 0.6980995475113122,
+          "gain": 0.08921278210280759
+        },
+        "controlled/dfl": {
+          "baseline": 0.593840651698788,
+          "v36": 0.6737639704489486,
+          "gain": 0.07992331875016068
+        },
+        "raw/all": {
+          "baseline": 0.5582128777923785,
+          "v36": 0.6418662987583093,
+          "gain": 0.08365342096593076
+        },
+        "raw/metrica": {
+          "baseline": 0.6088867654085046,
+          "v36": 0.6980995475113122,
+          "gain": 0.08921278210280759
+        },
+        "raw/dfl": {
+          "baseline": 0.5389885807504078,
+          "v36": 0.6203019260801665,
+          "gain": 0.08131334532975876
+        }
+      },
+      "per_match": [
+        {
+          "name": "DFL_J03WMX",
+          "switch_cost": 0.5,
+          "baseline": 0.5761517615176152,
+          "v36": 0.7050251256281408
+        },
+        {
+          "name": "DFL_J03WN1",
+          "switch_cost": 0.5,
+          "baseline": 0.5696498054474708,
+          "v36": 0.6240396530359356
+        },
+        {
+          "name": "DFL_J03WOH",
+          "switch_cost": 0.5,
+          "baseline": 0.6207906295754027,
+          "v36": 0.6851485148514851
+        },
+        {
+          "name": "DFL_J03WOY",
+          "switch_cost": 0.5,
+          "baseline": 0.5647979139504563,
+          "v36": 0.6427860696517413
+        },
+        {
+          "name": "DFL_J03WPY",
+          "switch_cost": 0.5,
+          "baseline": 0.6216296296296296,
+          "v36": 0.7045267489711935
+        },
+        {
+          "name": "DFL_J03WQQ",
+          "switch_cost": 0.5,
+          "baseline": 0.5997322623828647,
+          "v36": 0.6666666666666666
+        },
+        {
+          "name": "DFL_J03WR9",
+          "switch_cost": 0.5,
+          "baseline": 0.6128834355828221,
+          "v36": 0.6972307692307693
+        },
+        {
+          "name": "Sample_Game_1",
+          "switch_cost": 0.5,
+          "baseline": 0.5966480446927374,
+          "v36": 0.6997333333333333
+        },
+        {
+          "name": "Sample_Game_2",
+          "switch_cost": 0.5,
+          "baseline": 0.5969325153374233,
+          "v36": 0.6812865497076024
+        },
+        {
+          "name": "Sample_Game_3",
+          "switch_cost": 0.5,
+          "baseline": 0.6317241379310345,
+          "v36": 0.711340206185567
+        }
+      ],
+      "wins": 10,
+      "bootstrap": {
+        "unit": "whole_match",
+        "draws": 2000,
+        "seed": 20271027,
+        "mean": 0.08275068009777331,
+        "interval_90": [
+          0.07203264103941487,
+          0.09444262324248823
+        ],
+        "share_first_better": 1.0
+      },
+      "fixed_switch_cost_diagnostic": {
+        "0.25": 0.6799580822635578,
+        "0.5": 0.6809453865669648,
+        "1.0": 0.6756712328767124
+      }
+    }
+  },
+  "practice_rules": {
+    "P1": true,
+    "P2": true,
+    "P3": true
+  },
+  "practice_pass": true,
+  "public_or_bar_ath_data_used": false,
+  "submission_changed": false,
+  "final_model": {
+    "trained_on": "10 practice games: recorded + 25% and 50% hidden with generic 0.5-60 s gaps",
+    "seed": 3211,
+    "weights": "data/runs/v36_seq_weights.npz (not in the submission)",
+    "switch_cost_s": 0.5,
+    "switch_cost_rule": "best pooled out-of-fold practice value (V35 rule)"
+  },
+  "bar_ath_checks": {
+    "submission_sha256_prefix": "db5a3c8bf3ab",
+    "frames_changed_vs_v33": 13461,
+    "C1_valid_file": true,
+    "C2_dead_share": 0.3781,
+    "C3_false_dead_on_clear_live": {
+      "value": 0.061,
+      "limit": 0.065,
+      "pass": true
+    },
+    "C4_possessions_per_live_minute": 4.98,
+    "C5_clear_control_agreement": {
+      "value": 0.8494,
+      "v33": 0.9058,
+      "v35": 0.8549,
+      "pass": false
+    }
+  },
+  "decision": "Not adopted: C5 failed (0.849 vs 0.906 required). Broad gaps did not fix the V35 drop, so the long-gap explanation is not supported. Submission stays V33 (504f10ea). Public window not scored."
+}

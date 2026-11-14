@@ -2,6 +2,14 @@
 
 Every experiment in the order we ran it, kept as written at the time. Numbers and "current"/"best" labels describe that moment, not today. For the current submission, how to rebuild it and a results summary, see [README.md](README.md).
 
+## V36: the sequence model with long ball gaps (14 November 2026, tested, not adopted)
+
+**Why.** V35's failed check pointed to long ball gaps, so V36 (`run_v36.py`) retrains the same model on practice copies where the ball is hidden for generic lengths between 0.5 s and 60 s (25% and 50% of frames). Nothing is measured on BAR-ATH. The rules were fixed before any copy was made, and it was declared as one attempt.
+
+**Practice result:** Spell F1 0.562 → **0.642** (+0.080) on the copies with the ball hidden, and 0.598 → 0.681 on the untouched copies. It won all 10 matches, and every bootstrap draw was positive. All practice rules passed.
+
+**The check failed again.** On BAR-ATH frames where one player clearly controls a moving ball, agreement was 84.9%, against 90.6% for V33 (V35: 85.5%). Clearly live frames called dead stayed at 6.1%. Training on long gaps did not fix the drop, so long gaps were not its cause. **Decision: not adopted. V33 stays the submission, and the sequence model is closed.** The public window was not scored. Summary: `results/first_trial_v36.json`.
+
 ## V34 and V35: a sequence model for possession (3 November 2026, tested, not adopted)
 
 **Why.** On the 10 practice matches, 75% of the possessions we miss last under 5 s. Possessions under 2 s are found only 11% of the time, and they are missed even with complete tracking. So the limit is the model, not missing data.
